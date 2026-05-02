@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
+
+  --color-space-900: #050B14;
+  --color-space-800: #0B132B;
+  --color-space-700: #1C0F45;
+  --color-space-600: #2E1B5B;
+  
+  --color-gold-500: #D4AF37;
+  --color-gold-400: #FCD34D;
+  --color-gold-300: #FDE68A;
+  
+  --color-background: var(--color-space-900);
+  --color-foreground: #F8FAFC;
+}
+
+:root {
+  background-color: var(--color-space-900);
+  color: #F8FAFC;
+}
+
+body {
+  font-family: var(--font-sans), sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif), serif;
+}
+
+.galaxy-bg {
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(28, 15, 69, 0.4), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(46, 27, 91, 0.4), transparent 25%);
+}

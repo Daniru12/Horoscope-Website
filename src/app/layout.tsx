@@ -3,6 +3,7 @@ import { Noto_Sans_Sinhala, Abhaya_Libre } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import AuthProvider from "@/components/AuthProvider";
 
 const notoSansSinhala = Noto_Sans_Sinhala({
   variable: "--font-inter", // keeping the variable name the same so we don't have to change globals.css
@@ -29,11 +30,13 @@ export default function RootLayout({
   return (
     <html lang="si" className={`${notoSansSinhala.variable} ${abhayaLibre.variable}`}>
       <body className="galaxy-bg text-foreground min-h-screen flex flex-col antialiased">
-        <Navbar />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

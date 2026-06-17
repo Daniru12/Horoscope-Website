@@ -2,8 +2,23 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import Link from "next/link";
 import { User, Calendar, MapPin, Clock, FileText } from "lucide-react";
+import ImageLightbox from "@/components/ImageLightbox";
 import connectToDatabase from "@/lib/mongodb";
 import ServiceRequest from "@/models/ServiceRequest";
+import PaymentUpload from "@/components/PaymentUpload";
+import Service from "@/models/Service";
+
+const getFallbackPrice = (serviceName: string, services: any[] = []) => {
+  if (services && services.length > 0) {
+    const found = services.find(s => s.title === serviceName);
+    if (found && found.price) return found.price;
+  }
+  if (!serviceName) return "රු. 3000";
+  if (serviceName.includes("පොරොන්දම්")) return "රු. 4500";
+  if (serviceName.includes("නාමකරණය")) return "රු. 2500";
+  if (serviceName.includes("වාර්ෂික")) return "රු. 4000";
+  return "රු. 3000";
+};
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -17,14 +32,18 @@ export default async function ProfilePage() {
   }
 
   await connectToDatabase();
-  const requests = await ServiceRequest.find({ user: session.user.id }).sort({ createdAt: -1 });
+  const requests = await ServiceRequest.find({ user: session.user.id })
+    .populate('service')
+    .sort({ createdAt: -1 });
+
+  const allServices = await Service.find({ isActive: { $ne: false } });
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-5xl">
       <div className="flex flex-col md:flex-row gap-8">
         
         <div className="w-full md:w-1/3">
-          <div className="bg-space-800/80 backdrop-blur-md rounded-3xl p-8 border border-space-700 shadow-2xl text-center sticky top-24">
+          <div className="bg-space-800/80 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-space-700 shadow-2xl text-center sticky top-24">
             <div className="w-32 h-32 mx-auto rounded-full border-4 border-gold-500/50 mb-6 overflow-hidden bg-space-900 flex items-center justify-center">
               {session.user.image ? (
                 <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
@@ -44,7 +63,7 @@ export default async function ProfilePage() {
         </div>
 
         <div className="w-full md:w-2/3">
-          <div className="bg-space-800/60 backdrop-blur-md rounded-3xl p-8 border border-space-700 shadow-xl min-h-[500px]">
+          <div className="bg-space-800/60 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-space-700 shadow-xl min-h-[500px]">
             <h3 className="text-2xl font-serif font-bold text-white mb-6 border-b border-space-700 pb-4">
               ඔබගේ සේවා ඉල්ලුම් (Service Requests)
             </h3>
@@ -67,7 +86,7 @@ export default async function ProfilePage() {
                         <span className="text-xs text-gray-500 block mb-1">
                           ඉල්ලුම් කළ දිනය: {new Date(req.createdAt).toLocaleDateString('si-LK')}
                         </span>
-                        <h4 className="text-lg font-medium text-white">ජ්‍යෝතිෂ්‍ය කියවීම</h4>
+                        <h4 className="text-lg font-medium text-white">{req.serviceName || "ජ්‍යෝතිෂ්‍ය කියවීම"}</h4>
                       </div>
                       <div className="text-right">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium block mb-2 ${
@@ -122,30 +141,50 @@ export default async function ProfilePage() {
                           <FileText className="w-4 h-4" /> පලාපල වාර්තාව (Horoscope Result)
                         </h4>
 
-                        <div className={`${req.paymentStatus !== 'approved' ? 'blur-sm select-none pointer-events-none' : ''}`}>
-                          <p className="text-gray-300 text-sm whitespace-pre-wrap">{req.resultText || "පලාපල වාර්තාවක් නොමැත."}</p>
-                          {req.resultImageUrls && req.resultImageUrls.length > 0 && (
-                            <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
-                              {req.resultImageUrls.map((img: string, idx: number) => (
-                                <img key={idx} src={img} alt="Result" className="h-32 w-auto rounded border border-space-700" />
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                        {req.paymentStatus === 'approved' ? (
+                          <div>
+                            <p className="text-gray-300 text-sm whitespace-pre-wrap">{req.resultText || "පලාපල වාර්තාවක් නොමැත."}</p>
+                            {req.resultPdfUrl && (
+                              <a 
+                                href={req.resultPdfUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="mt-4 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-5 rounded-xl transition-colors shadow-lg shadow-emerald-900/20"
+                              >
+                                <FileText className="w-5 h-5" /> PDF වාර්තාව බාගත කරන්න (Download PDF Report)
+                              </a>
+                            )}
+                            {req.resultImageUrls && req.resultImageUrls.length > 0 && (
+                              <ImageLightbox images={req.resultImageUrls} />
+                            )}
+                          </div>
+                        ) : (
+                          <div className="blur-sm select-none pointer-events-none">
+                            <p className="text-gray-300 text-sm whitespace-pre-wrap">{req.resultText || "පලාපල වාර්තාවක් නොමැත."}</p>
+                            {req.resultPdfUrl && (
+                              <button className="mt-4 inline-flex items-center gap-2 bg-emerald-600 text-white font-semibold py-2.5 px-5 rounded-xl">
+                                <FileText className="w-5 h-5" /> PDF වාර්තාව බාගත කරන්න (Download PDF Report)
+                              </button>
+                            )}
+                            {req.resultImageUrls && req.resultImageUrls.length > 0 && (
+                              <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
+                                {req.resultImageUrls.map((img: string, idx: number) => (
+                                  <img key={idx} src={img} alt="Result" className="h-32 w-auto rounded border border-space-700" />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                         {req.paymentStatus === 'pending' && (
                           <div className="absolute inset-0 bg-space-900/60 flex flex-col items-center justify-center p-4 backdrop-blur-[2px]">
-                            <p className="text-white font-medium mb-3 text-center">වාර්තාව බැලීම සඳහා ගෙවීම් රිසිට්පත උඩුගත කරන්න.</p>
-                            <form action="/api/upload-payment-action" method="POST" className="flex items-center gap-2" encType="multipart/form-data">
-                              <input type="hidden" name="requestId" value={req._id.toString()} />
-                              <label className="cursor-pointer bg-space-700 hover:bg-space-600 px-3 py-2 rounded text-sm text-white transition-colors">
-                                රිසිට්පත තෝරන්න (Select Receipt)
-                                <input type="file" name="paymentReceipt" accept="image/*" className="hidden" required onChange={(e) => {
-                                  const form = e.target.closest('form');
-                                  if (form) form.requestSubmit();
-                                }} />
-                              </label>
-                            </form>
+                            <p className="text-white font-medium mb-3 text-center">
+                              වාර්තාව බැලීම සඳහා ගෙවීම් රිසිට්පත උඩුගත කරන්න.
+                              <span className="block text-gold-400 font-bold mt-1 text-sm">
+                                ගෙවිය යුතු මුදල: {(req.service as any)?.price || getFallbackPrice(req.serviceName, allServices)}
+                              </span>
+                            </p>
+                            <PaymentUpload requestId={req._id.toString()} />
                           </div>
                         )}
 

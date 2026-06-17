@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Menu, Search, User, LogOut } from "lucide-react";
 import { auth, signOut } from "@/auth";
+import MobileMenu from "./MobileMenu";
 
 export default async function Navbar() {
   const session = await auth();
@@ -22,7 +23,6 @@ export default async function Navbar() {
           <Link href="/services" className="hover:text-gold-400 transition-colors">සේවාවන්</Link>
           {session && (
             <>
-              <Link href="/service-request" className="hover:text-gold-400 transition-colors">සේවා ඉල්ලුම්</Link>
               {(session as any).user?.role === 'admin' && (
                 <Link href="/admin" className="hover:text-gold-400 text-green-400 transition-colors font-bold">Admin Panel</Link>
               )}
@@ -37,7 +37,7 @@ export default async function Navbar() {
           
           {session ? (
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/profile" className="flex items-center gap-2 hover:text-gold-400 transition-colors">
+              <Link href={(session as any).user?.role === 'admin' ? "/admin" : "/profile"} className="flex items-center gap-2 hover:text-gold-400 transition-colors">
                 {session.user?.image ? (
                   <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full border border-gold-500" />
                 ) : (
@@ -63,9 +63,7 @@ export default async function Navbar() {
             </Link>
           )}
 
-          <button className="p-2 hover:bg-space-800 rounded-full transition-colors md:hidden">
-            <Menu className="w-6 h-6" />
-          </button>
+          <MobileMenu session={session} />
         </div>
       </div>
     </header>

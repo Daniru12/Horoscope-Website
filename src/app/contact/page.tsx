@@ -60,7 +60,7 @@ export default function ContactPage() {
 
         {/* Contact Form */}
         <div className="w-full lg:w-2/3">
-          <div className="bg-space-800/80 border border-space-700 p-8 md:p-10 rounded-3xl">
+          <div className="bg-space-800/80 border border-space-700 p-6 md:p-10 rounded-3xl">
             <h2 className="text-2xl font-serif font-bold text-white mb-6">පණිවිඩයක් යවන්න</h2>
             <form className="flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

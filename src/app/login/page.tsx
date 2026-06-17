@@ -39,7 +39,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md bg-space-800/80 backdrop-blur-md rounded-3xl p-8 border border-space-700 shadow-2xl relative overflow-hidden">
+      <div className="w-full max-w-md bg-space-800/80 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-space-700 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         
         <div className="relative z-10">

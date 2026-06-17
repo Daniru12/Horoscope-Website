@@ -21,7 +21,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ message: "Forbidden: Admin access required" }, { status: 403 });
     }
 
-    const { resultText, resultImageUrls } = await req.json();
+    const { resultText, resultImageUrls, resultPdfUrl } = await req.json();
 
     const request = await ServiceRequest.findById(id);
     if (!request) {
@@ -30,6 +30,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     request.resultText = resultText;
     request.resultImageUrls = resultImageUrls || [];
+    if (resultPdfUrl) request.resultPdfUrl = resultPdfUrl;
     request.status = 'completed'; // Admin marking it as completed by uploading result
 
     await request.save();

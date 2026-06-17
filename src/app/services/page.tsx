@@ -1,38 +1,63 @@
 import Link from "next/link";
 import { Star, Heart, Book, Sparkles, ArrowRight } from "lucide-react";
+import connectToDatabase from "@/lib/mongodb";
+import Service from "@/models/Service";
 
-const SERVICES = [
-  {
-    title: "පෞද්ගලික කේන්දර පරීක්ෂාව",
-    icon: Star,
-    description: "ඔබේ ජීවන ගමන් මග, ශක්තීන්, අභියෝග සහ අනාගත අවස්ථාවන් අනාවරණය කර ගැනීම සඳහා ඔබේ කේන්දරය පිළිබඳ පුළුල් විශ්ලේෂණයක්.",
-    price: "රු. 3000",
-    duration: "විනාඩි 60"
-  },
-  {
-    title: "පොරොන්දම් ගැලපීම",
-    icon: Heart,
-    description: "සාමකාමී, දිගුකාලීන සහ සමෘද්ධිමත් විවාහ ජීවිතයක් සහතික කිරීම සඳහා සහකරුවන් අතර ගැළපීම පිළිබඳ ගැඹුරු විශ්ලේෂණයක්.",
-    price: "රු. 4500",
-    duration: "විනාඩි 90"
-  },
-  {
-    title: "නාමකරණය සහ අංක විද්‍යාව",
-    icon: Book,
-    description: "ඔබේ නමේ සැඟවුණු බලපෑම සහ උපරිම සාර්ථකත්වය සඳහා ඔබේ උපන් දිනය සමඟ එය පරිපූර්ණ ලෙස පෙළගස්වන්නේ කෙසේදැයි සොයා ගන්න.",
-    price: "රු. 2500",
-    duration: "විනාඩි 45"
-  },
-  {
-    title: "වාර්ෂික පලාපල",
-    icon: Sparkles,
-    description: "රැකියාව, ආදරය, සෞඛ්‍යය සහ ධනය සම්බන්ධයෙන් ඉදිරි වසරේ මාසෙන් මාසයට ඔබට ලැබෙන්නේ කුමක්ද යන්න පිළිබඳව.",
-    price: "රු. 4000",
-    duration: "විනාඩි 60"
+// Icon mapping dictionary
+const ICON_MAP: Record<string, any> = {
+  Star,
+  Heart,
+  Book,
+  Sparkles
+};
+
+const getIcon = (iconName?: string) => {
+  if (iconName && ICON_MAP[iconName]) {
+    return ICON_MAP[iconName];
   }
-];
+  return Sparkles;
+};
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  await connectToDatabase();
+  let services = await Service.find({ isActive: { $ne: false } }).sort({ createdAt: 1 });
+
+  if (services.length === 0) {
+    // Seed default services
+    const DEFAULT_SERVICES = [
+      {
+        title: "පෞද්ගලික කේන්දර පරීක්ෂාව",
+        description: "ඔබේ ජීවන ගමන් මග, ශක්තීන්, අභියෝග සහ අනාගත අවස්ථාවන් අනාවරණය කර ගැනීම සඳහා ඔබේ කේන්දරය පිළිබඳ පුළුල් විශ්ලේෂණයක්.",
+        price: "රු. 3000",
+        duration: "විනාඩි 60",
+        iconName: "Star"
+      },
+      {
+        title: "පොරොන්දම් ගැලපීම",
+        description: "සාමකාමී, දිගුකාලීන සහ සමෘද්ධිමත් විවාහ ජීවිතයක් සහතික කිරීම සඳහා සහකරුවන් අතර ගැළපීම පිළිබඳ ගැඹුරු විශ්ලේෂණයක්.",
+        price: "රු. 4500",
+        duration: "විනාඩි 90",
+        iconName: "Heart"
+      },
+      {
+        title: "නාමකරණය සහ අංක විද්‍යාව",
+        description: "ඔබේ නමේ සැඟවුණු බලපෑම සහ උපරිම සාර්ථකත්වය සඳහා ඔබේ උපන් දිනය සමඟ එය පරිපූර්ණ ලෙස පෙළගස්වන්නේ කෙසේදැයි සොයා ගන්න.",
+        price: "රු. 2500",
+        duration: "විනාඩි 45",
+        iconName: "Book"
+      },
+      {
+        title: "වාර්ෂික පලාපල",
+        description: "රැකියාව, ආදරය, සෞඛ්‍යය සහ ධනය සම්බන්ධයෙන් ඉදිරි වසරේ මාසෙන් මාසයට ඔබට ලැබෙන්නේ කුමක්ද යන්න පිළිබඳව.",
+        price: "රු. 4000",
+        duration: "විනාඩි 60",
+        iconName: "Sparkles"
+      }
+    ];
+    await Service.insertMany(DEFAULT_SERVICES);
+    services = await Service.find({ isActive: { $ne: false } }).sort({ createdAt: 1 });
+  }
+
   return (
     <div className="container mx-auto px-4 py-16 max-w-6xl">
       <div className="text-center mb-16">
@@ -43,28 +68,36 @@ export default function ServicesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        {SERVICES.map((service, i) => (
-          <div key={i} className="bg-space-800/40 border border-space-700 rounded-2xl p-8 hover:bg-space-800 hover:border-gold-500/50 transition-all duration-300 group">
-            <div className="w-14 h-14 bg-space-700 rounded-xl flex items-center justify-center text-gold-400 mb-6 group-hover:scale-110 transition-transform">
-              <service.icon className="w-7 h-7" />
-            </div>
-            
-            <h2 className="text-2xl font-serif font-bold text-white mb-4">{service.title}</h2>
-            <p className="text-gray-400 mb-8 h-20">
-              {service.description}
-            </p>
-            
-            <div className="flex items-center justify-between pt-6 border-t border-space-700">
-              <div className="flex flex-col">
-                <span className="text-2xl font-bold text-gold-400">{service.price}</span>
-                <span className="text-sm text-gray-500">{service.duration} සැසිය</span>
+        {services.map((service: any, i: number) => {
+          const ServiceIcon = getIcon(service.iconName);
+          return (
+            <div key={service._id ? service._id.toString() : i} className="bg-space-800/40 border border-space-700 rounded-2xl p-6 md:p-8 hover:bg-space-800 hover:border-gold-500/50 transition-all duration-300 group flex flex-col justify-between">
+              <div>
+                <div className="w-14 h-14 bg-space-700 rounded-xl flex items-center justify-center text-gold-400 mb-6 group-hover:scale-110 transition-transform">
+                  <ServiceIcon className="w-7 h-7" />
+                </div>
+                
+                <h2 className="text-2xl font-serif font-bold text-white mb-4">{service.title}</h2>
+                <p className="text-gray-400 mb-8 min-h-[5rem]">
+                  {service.description}
+                </p>
               </div>
-              <button className="px-6 py-3 bg-gold-500 hover:bg-gold-400 text-space-900 font-bold rounded-lg transition-colors flex items-center gap-2">
-                වෙන්කරවා ගන්න <ArrowRight className="w-4 h-4" />
-              </button>
+              
+              <div className="flex items-center justify-between pt-6 border-t border-space-700 mt-auto">
+                <div className="flex flex-col">
+                  <span className="text-2xl font-bold text-gold-400">{service.price}</span>
+                  <span className="text-sm text-gray-500">{service.duration} සැසිය</span>
+                </div>
+                <Link 
+                  href={`/service-request?serviceId=${service._id ? service._id.toString() : ''}`}
+                  className="px-6 py-3 bg-gold-500 hover:bg-gold-400 text-space-900 font-bold rounded-lg transition-colors flex items-center gap-2"
+                >
+                  වෙන්කරවා ගන්න <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Booking CTA */}

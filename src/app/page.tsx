@@ -24,7 +24,16 @@ export default function Home() {
       <section className="w-full relative py-20 md:py-32 flex flex-col items-center justify-center text-center px-4 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-space-900/80 z-10"></div>
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover bg-center"></div>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover z-0"
+          >
+            <source src="/video/zodiac-bg.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover bg-center -z-10"></div>
         </div>
 
         <div className="relative z-20 max-w-4xl mx-auto flex flex-col items-center">

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import ServiceRequest from "@/models/ServiceRequest";
 import User from "@/models/User";
+import Service from "@/models/Service";
 import { auth } from "@/auth";
 
 export async function GET(req: Request) {
@@ -20,6 +21,7 @@ export async function GET(req: Request) {
 
     const requests = await ServiceRequest.find()
       .populate('user', 'name email image')
+      .populate('service')
       .sort({ createdAt: -1 });
 
     return NextResponse.json({ requests }, { status: 200 });

@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="col-span-1 md:col-span-2">
           <Link href="/" className="flex items-center gap-2 mb-4">
-            <span className="text-2xl text-gold-400">✨</span>
+            <img src="/horoscope-result-1.png" alt="Logo" className="w-10 h-10 rounded-full object-cover border border-gold-500/50" />
             <span className="font-serif text-xl font-bold tracking-wider text-gold-400">
               සුභද්‍රා ජ්‍යෝතිෂ්‍ය
             </span>

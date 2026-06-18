@@ -185,11 +185,17 @@ export default async function ProfilePage() {
                               </p>
 
                               <div className="bg-space-800 p-3 rounded-xl border border-space-700 text-sm text-left mb-4 w-full max-w-sm">
-                                <p className="text-gray-400 mb-1">බැංකුව: <span className="text-white font-semibold">{settings.bankName || "-"}</span></p>
-                                <p className="text-gray-400 mb-1">ගිණුම් නාමය: <span className="text-white font-semibold">{settings.accountName || "-"}</span></p>
-                                <p className="text-gray-400 mb-2">ගිණුම් අංකය: <span className="text-gold-400 font-bold">{settings.accountNumber || "-"}</span></p>
+                                <p className="text-gray-400 mb-1">බැංකුව (Bank): <span className="text-white font-semibold">{settings.bankName || "-"}</span></p>
+                                <p className="text-gray-400 mb-1">ගිණුම් නාමය (Account Name): <span className="text-white font-semibold">{settings.accountName || "-"}</span></p>
+                                <p className="text-gray-400 mb-1">ගිණුම් අංකය (Account Number): <span className="text-gold-400 font-bold">{settings.accountNumber || "-"}</span></p>
+                                {settings.mobileNumber && (
+                                  <p className="text-gray-400 mb-1">දුරකථන අංකය (Mobile): <span className="text-white font-semibold">{settings.mobileNumber}</span></p>
+                                )}
+                                {settings.email && (
+                                  <p className="text-gray-400 mb-2">විද්‍යුත් තැපෑල (Email): <span className="text-white font-semibold">{settings.email}</span></p>
+                                )}
                                 <p className="text-emerald-400 font-bold pt-2 border-t border-space-700 mt-1">
-                                  ගෙවිය යුතු මුදල: {(req.service as any)?.price || getFallbackPrice(req.serviceName, allServices)}
+                                  ගෙවිය යුතු මුදල (Price): {(req.service as any)?.price || getFallbackPrice(req.serviceName, allServices)}
                                 </p>
                               </div>
 

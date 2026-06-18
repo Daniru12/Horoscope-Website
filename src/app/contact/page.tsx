@@ -1,6 +1,23 @@
 import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import connectToDatabase from "@/lib/mongodb";
+import Setting from "@/models/Setting";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  let settings: any = {};
+  try {
+    await connectToDatabase();
+    settings = (await Setting.findOne()) || {};
+  } catch (error) {
+    console.error("Failed to fetch settings for contact page:", error);
+  }
+
+  const email = settings.email || "info@subadra-astrology.com";
+  const mobileNumber = settings.mobileNumber || "+1 (555) 123-4567";
+
+  // Formulate WhatsApp link (clean digits from mobile number)
+  const cleanMobile = mobileNumber.replace(/[^0-9]/g, "");
+  const whatsappUrl = cleanMobile ? `https://wa.me/${cleanMobile}` : "#";
+
   return (
     <div className="container mx-auto px-4 py-16 max-w-6xl">
       <div className="text-center mb-16">
@@ -19,7 +36,7 @@ export default function ContactPage() {
             </div>
             <div>
               <h3 className="text-white font-bold mb-1">දුරකථනය</h3>
-              <p className="text-gray-400 mb-2">+1 (555) 123-4567</p>
+              <p className="text-gray-400 mb-2">{mobileNumber}</p>
               <p className="text-xs text-gray-500">සඳුදා සිට සිකුරාදා දක්වා පෙ.ව. 9 සිට ප.ව. 6 දක්වා.</p>
             </div>
           </div>
@@ -30,8 +47,8 @@ export default function ContactPage() {
             </div>
             <div>
               <h3 className="text-white font-bold mb-1">වට්ස්ඇප්</h3>
-              <p className="text-gray-400 mb-3">+1 (555) 987-6543</p>
-              <a href="#" className="inline-block px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors">
+              <p className="text-gray-400 mb-3">{mobileNumber}</p>
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-colors">
                 වට්ස්ඇප් හරහා සම්බන්ධ වන්න
               </a>
             </div>
@@ -43,7 +60,7 @@ export default function ContactPage() {
             </div>
             <div>
               <h3 className="text-white font-bold mb-1">විද්‍යුත් තැපෑල</h3>
-              <p className="text-gray-400">info@subadra-astrology.com</p>
+              <p className="text-gray-400">{email}</p>
             </div>
           </div>
 

@@ -430,7 +430,7 @@ export default function AdminDashboardPage() {
         
         {/* Sidebar / Tabs */}
         <div className="w-full md:w-1/4">
-          <div className="bg-space-800/80 backdrop-blur-md rounded-3xl p-6 border border-space-700 shadow-xl sticky top-24">
+          <div className="bg-space-800/80 backdrop-blur-md rounded-3xl p-6 border border-space-700 shadow-xl sticky top-24 max-h-[85vh] overflow-y-auto custom-scrollbar">
             <h2 className="text-xl font-serif font-bold text-white mb-6 border-b border-space-700 pb-4">
               පරිපාලක පුවරුව (Admin)
             </h2>
@@ -443,6 +443,15 @@ export default function AdminDashboardPage() {
               >
                 <BarChart3 className="w-4 h-4" />
                 දළ විශ්ලේෂණය (Overview)
+              </button>
+              <button 
+                onClick={() => setActiveTab('settings')}
+                className={`w-full text-left px-4 py-3 rounded-xl transition-colors font-medium flex items-center gap-3 ${
+                  activeTab === 'settings' ? 'bg-gold-500 text-space-900' : 'text-gray-300 hover:bg-space-700'
+                }`}
+              >
+                <Settings className="w-4 h-4" />
+                සැකසුම් (Settings)
               </button>
               <button 
                 onClick={() => setActiveTab('requests')}
@@ -492,15 +501,7 @@ export default function AdminDashboardPage() {
                   </span>
                 )}
               </button>
-              <button 
-                onClick={() => setActiveTab('settings')}
-                className={`w-full text-left px-4 py-3 rounded-xl transition-colors font-medium flex items-center gap-3 ${
-                  activeTab === 'settings' ? 'bg-gold-500 text-space-900' : 'text-gray-300 hover:bg-space-700'
-                }`}
-              >
-                <Settings className="w-4 h-4" />
-                සැකසුම් (Settings)
-              </button>
+
             </nav>
           </div>
         </div>

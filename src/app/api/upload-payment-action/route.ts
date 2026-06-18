@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
     const uploadResult = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: "horoscope_payments" },
+        { folder: "horoscope_payments", resource_type: "auto" },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);

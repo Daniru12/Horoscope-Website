@@ -7,9 +7,11 @@ import {
   Loader2, CheckCircle2, XCircle, Upload, Eye, EyeOff,
   TrendingUp, DollarSign, Users, FileText, Clock,
   ArrowUpRight, CalendarDays, BarChart3, Activity,
-  Camera, X, Image as ImageIcon
+  Camera, X, Image as ImageIcon, Settings
 } from "lucide-react";
 import { jsPDF } from "jspdf";
+import AdminSettings from "@/components/AdminSettings";
+import toast from "react-hot-toast";
 
 const getFallbackPrice = (serviceName: string, services: any[] = []) => {
   if (services && services.length > 0) {
@@ -28,10 +30,11 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'payments' | 'completed' | 'services' | 'users'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'payments' | 'services' | 'users' | 'settings'>('overview');
 
-  // Sub-tab for payments
+  // Sub-tab for payments and requests
   const [paymentSubTab, setPaymentSubTab] = useState<'pending' | 'history'>('pending');
+  const [requestSubTab, setRequestSubTab] = useState<'pending' | 'completed'>('pending');
 
   // States for uploading result
   const [selectedRequest, setSelectedRequest] = useState<string | null>(null);
@@ -75,7 +78,7 @@ export default function AdminDashboardPage() {
         const data = await res.json();
         setRequests(data.requests);
       } else if (res.status === 403) {
-        alert("Access Denied. Admin only.");
+        toast.error("Access Denied. Admin only.");
         router.push("/");
       }
     } catch (error) {
@@ -138,7 +141,7 @@ export default function AdminDashboardPage() {
       });
 
       if (res.ok) {
-        alert(isEditing ? "Service updated successfully!" : "Service created successfully!");
+        toast.success(isEditing ? "Service updated successfully!" : "Service created successfully!");
         setNewServiceTitle("");
         setNewServiceDescription("");
         setNewServicePrice("");
@@ -148,11 +151,11 @@ export default function AdminDashboardPage() {
         fetchServices();
       } else {
         const data = await res.json();
-        alert(data.message || "Failed to save service");
+        toast.error(data.message || "Failed to save service");
       }
     } catch (error) {
       console.error("Save service error", error);
-      alert("Error saving service");
+      toast.error("Error saving service");
     } finally {
       setAddingService(false);
     }
@@ -166,8 +169,9 @@ export default function AdminDashboardPage() {
       });
       if (res.ok) {
         fetchServices();
+        toast.success("Service status updated.");
       } else {
-        alert("Failed to toggle service status.");
+        toast.error("Failed to toggle service status.");
       }
     } catch (error) {
       console.error("Toggle service error", error);
@@ -198,10 +202,10 @@ export default function AdminDashboardPage() {
         method: "POST",
       });
       if (res.ok) {
-        alert("Payment approved!");
+        toast.success("Payment approved!");
         fetchRequests();
       } else {
-        alert("Failed to approve payment.");
+        toast.error("Failed to approve payment.");
       }
     } catch (error) {
       console.error("Approval error", error);
@@ -220,7 +224,7 @@ export default function AdminDashboardPage() {
       }
     } catch (err) {
       console.error("Error accessing camera:", err);
-      alert("කැමරාවට පිවිසීමේදී දෝෂයක් ඇති විය.");
+      toast.error("කැමරාවට පිවිසීමේදී දෝෂයක් ඇති විය.");
       setShowCamera(false);
     }
   };
@@ -248,7 +252,7 @@ export default function AdminDashboardPage() {
           if (blob) {
             const file = new File([blob], `capture_${Date.now()}.jpg`, { type: "image/jpeg" });
             setResultImages(prev => [...prev, file]);
-            // alert("ඡායාරූපය ලබාගන්නා ලදී (Photo Captured)");
+            toast.success("ඡායාරූපය ලබාගන්නා ලදී (Photo Captured)");
           }
         }, 'image/jpeg', 0.8);
       }
@@ -359,18 +363,18 @@ export default function AdminDashboardPage() {
       });
 
       if (res.ok) {
-        alert("Result uploaded successfully!");
+        toast.success("Result uploaded successfully!");
         setSelectedRequest(null);
         setResultText("");
         setResultImages([]);
         if (showCamera) stopCamera();
         fetchRequests();
       } else {
-        alert("Failed to upload result");
+        toast.error("Failed to upload result");
       }
     } catch (error) {
       console.error("Result upload error", error);
-      alert("Error uploading result");
+      toast.error("Error uploading result");
     } finally {
       setUploadingResult(false);
     }
@@ -426,7 +430,7 @@ export default function AdminDashboardPage() {
         
         {/* Sidebar / Tabs */}
         <div className="w-full md:w-1/4">
-          <div className="bg-space-800/80 backdrop-blur-md rounded-3xl p-6 border border-space-700 shadow-xl sticky top-24">
+          <div className="bg-space-800/80 backdrop-blur-md rounded-3xl p-6 border border-space-700 shadow-xl sticky top-24 max-h-[85vh] overflow-y-auto custom-scrollbar">
             <h2 className="text-xl font-serif font-bold text-white mb-6 border-b border-space-700 pb-4">
               පරිපාලක පුවරුව (Admin)
             </h2>
@@ -439,6 +443,15 @@ export default function AdminDashboardPage() {
               >
                 <BarChart3 className="w-4 h-4" />
                 දළ විශ්ලේෂණය (Overview)
+              </button>
+              <button 
+                onClick={() => setActiveTab('settings')}
+                className={`w-full text-left px-4 py-3 rounded-xl transition-colors font-medium flex items-center gap-3 ${
+                  activeTab === 'settings' ? 'bg-gold-500 text-space-900' : 'text-gray-300 hover:bg-space-700'
+                }`}
+              >
+                <Settings className="w-4 h-4" />
+                සැකසුම් (Settings)
               </button>
               <button 
                 onClick={() => setActiveTab('requests')}
@@ -467,19 +480,6 @@ export default function AdminDashboardPage() {
                 )}
               </button>
               <button 
-                onClick={() => setActiveTab('completed')}
-                className={`w-full text-left px-4 py-3 rounded-xl transition-colors font-medium flex items-center justify-between ${
-                  activeTab === 'completed' ? 'bg-gold-500 text-space-900' : 'text-gray-300 hover:bg-space-700'
-                }`}
-              >
-                <span className="flex items-center gap-3"><CheckCircle2 className="w-4 h-4" /> සම්පූර්ණ කළ (Completed)</span>
-                {completedRequests.length > 0 && (
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === 'completed' ? 'bg-space-900 text-gold-400' : 'bg-gold-500 text-space-900'}`}>
-                    {completedRequests.length}
-                  </span>
-                )}
-              </button>
-              <button 
                 onClick={() => setActiveTab('services')}
                 className={`w-full text-left px-4 py-3 rounded-xl transition-colors font-medium flex items-center gap-3 ${
                   activeTab === 'services' ? 'bg-gold-500 text-space-900' : 'text-gray-300 hover:bg-space-700'
@@ -501,6 +501,7 @@ export default function AdminDashboardPage() {
                   </span>
                 )}
               </button>
+
             </nav>
           </div>
         </div>
@@ -642,37 +643,150 @@ export default function AdminDashboardPage() {
             {activeTab === 'requests' && (
               <div>
                 <h3 className="text-2xl font-serif font-bold text-gold-400 mb-6">සේවා ඉල්ලුම් (Service Requests)</h3>
-                {pendingRequests.length === 0 ? (
-                  <p className="text-gray-400 text-center py-10">නව ඉල්ලුම් නොමැත.</p>
-                ) : (
-                  <div className="space-y-4">
-                    {pendingRequests.map((req) => (
-                      <div key={req._id} className="bg-space-900/50 rounded-2xl p-6 border border-space-700 flex flex-col md:flex-row justify-between md:items-center gap-4">
-                        <div>
-                          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gold-500/10 text-gold-300 border border-gold-500/20 mb-3">
-                            {req.serviceName || "ජ්‍යෝතිෂ්‍ය කියවීම"}
-                          </span>
-                          <h4 className="text-lg font-medium text-white">{req.user?.name}</h4>
-                          <p className="text-xs text-gray-400 mb-2">{req.user?.email}</p>
-                          <div className="text-sm text-gray-300 space-y-1">
-                            <p>උපන් දිනය: {req.birthDate} | වේලාව: {req.birthTime}</p>
-                            <p>ස්ථානය: {req.birthPlace}</p>
+                
+                {/* Sub-tab switcher for Requests */}
+                <div className="flex gap-2 mb-6 bg-space-900/60 p-1.5 rounded-xl border border-space-700 w-fit">
+                  <button
+                    onClick={() => setRequestSubTab('pending')}
+                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
+                      requestSubTab === 'pending'
+                        ? 'bg-gold-500 text-space-900 shadow-lg shadow-gold-500/20'
+                        : 'text-gray-400 hover:text-white hover:bg-space-800'
+                    }`}
+                  >
+                    <Clock className="w-4 h-4" />
+                    නව ඉල්ලුම් (Pending)
+                    {pendingRequests.length > 0 && (
+                      <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                        requestSubTab === 'pending' ? 'bg-space-900 text-gold-400' : 'bg-gold-500/20 text-gold-400'
+                      }`}>
+                        {pendingRequests.length}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setRequestSubTab('completed')}
+                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
+                      requestSubTab === 'completed'
+                        ? 'bg-gold-500 text-space-900 shadow-lg shadow-gold-500/20'
+                        : 'text-gray-400 hover:text-white hover:bg-space-800'
+                    }`}
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    සම්පූර්ණ කළ (Completed)
+                    {completedRequests.length > 0 && (
+                      <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                        requestSubTab === 'completed' ? 'bg-space-900 text-gold-400' : 'bg-emerald-500/20 text-emerald-400'
+                      }`}>
+                        {completedRequests.length}
+                      </span>
+                    )}
+                  </button>
+                </div>
+
+                {requestSubTab === 'pending' && (
+                  <>
+                    {pendingRequests.length === 0 ? (
+                      <p className="text-gray-400 text-center py-10">නව ඉල්ලුම් නොමැත.</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {pendingRequests.map((req) => (
+                          <div key={req._id} className="bg-space-900/50 rounded-2xl p-6 border border-space-700 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                            <div>
+                              <div className="flex items-center gap-3 mb-3">
+                                <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gold-500/10 text-gold-300 border border-gold-500/20">
+                                  {req.serviceName || "ජ්‍යෝතිෂ්‍ය කියවීම"}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  ලැබුණු දිනය: {new Date(req.createdAt).toLocaleString('si-LK')}
+                                </span>
+                              </div>
+                              <h4 className="text-lg font-medium text-white">{req.user?.name}</h4>
+                              <p className="text-xs text-gray-400 mb-2">{req.user?.email}</p>
+                              <div className="text-sm text-gray-300 space-y-1">
+                                <p>උපන් දිනය: {req.birthDate} | වේලාව: {req.birthTime}</p>
+                                <p>ස්ථානය: {req.birthPlace}</p>
+                              </div>
+                              {req.horoscopeImageUrl && (
+                                <a href={req.horoscopeImageUrl} target="_blank" rel="noopener noreferrer" className="text-gold-400 text-xs flex items-center gap-1 mt-3 hover:underline">
+                                  <Eye className="w-3 h-3" /> කේන්දර සටහන බලන්න
+                                </a>
+                              )}
+                            </div>
+                            <button 
+                              onClick={() => setSelectedRequest(req._id)}
+                              className="bg-gold-500 hover:bg-gold-400 text-space-900 text-sm font-bold px-6 py-3 rounded-xl transition-colors whitespace-nowrap"
+                            >
+                              ප්‍රතිඵල යොමු කරන්න (Upload Result)
+                            </button>
                           </div>
-                          {req.horoscopeImageUrl && (
-                            <a href={req.horoscopeImageUrl} target="_blank" rel="noopener noreferrer" className="text-gold-400 text-xs flex items-center gap-1 mt-3 hover:underline">
-                              <Eye className="w-3 h-3" /> කේන්දර සටහන බලන්න
-                            </a>
-                          )}
-                        </div>
-                        <button 
-                          onClick={() => setSelectedRequest(req._id)}
-                          className="bg-gold-500 hover:bg-gold-400 text-space-900 text-sm font-bold px-6 py-3 rounded-xl transition-colors whitespace-nowrap"
-                        >
-                          ප්‍රතිඵල යොමු කරන්න (Upload Result)
-                        </button>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
+                )}
+
+                {requestSubTab === 'completed' && (
+                  <>
+                    {completedRequests.length === 0 ? (
+                      <p className="text-gray-400 text-center py-10">සම්පූර්ණ කළ ඉල්ලුම් නොමැත.</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {completedRequests.map((req) => (
+                          <div key={req._id} className="bg-space-900/50 rounded-2xl p-6 border border-green-500/30 space-y-4">
+                            <div className="flex flex-col sm:flex-row justify-between items-start border-b border-space-800 pb-3 gap-3">
+                              <div>
+                                <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gold-500/10 text-gold-300 border border-gold-500/20 mb-2">
+                                  {req.serviceName || "ජ්‍යෝතිෂ්‍ය කියවීම"}
+                                </span>
+                                <h4 className="text-lg font-medium text-white">{req.user?.name}</h4>
+                                <p className="text-xs text-gray-400">{req.user?.email}</p>
+                                <p className="text-xs text-gray-500 mt-2">
+                                  ලැබුණු දිනය: {new Date(req.createdAt).toLocaleString('si-LK')} <br/>
+                                  අවසන් කළ දිනය: {new Date(req.updatedAt || req.createdAt).toLocaleString('si-LK')}
+                                </p>
+                              </div>
+                              <span className="px-3 py-1 bg-green-500/20 text-green-300 border border-green-500/30 rounded-full text-xs font-semibold">
+                                Completed
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-gray-300 bg-space-950/40 p-3 rounded-xl border border-space-850">
+                              <p><strong>උපන් දිනය:</strong> {req.birthDate}</p>
+                              <p><strong>වේලාව:</strong> {req.birthTime}</p>
+                              <p><strong>ස්ථානය:</strong> {req.birthPlace}</p>
+                            </div>
+
+                            {req.horoscopeImageUrl && (
+                              <div>
+                                <span className="text-xs text-gray-400 block mb-1">කේන්දර සටහන:</span>
+                                <a href={req.horoscopeImageUrl} target="_blank" rel="noopener noreferrer" className="text-gold-400 text-xs hover:underline flex items-center gap-1">
+                                  <Eye className="w-3.5 h-3.5" /> රූපය බලන්න (View Image)
+                                </a>
+                              </div>
+                            )}
+
+                            <div className="bg-space-950/60 p-4 rounded-xl border border-space-850 mt-2">
+                              <h5 className="text-gold-400 text-xs font-bold mb-2">පලාපල වාර්තාව (Uploaded Result)</h5>
+                              <p className="text-gray-300 text-sm whitespace-pre-wrap">{req.resultText || "ප්‍රතිඵල විස්තරයක් නොමැත."}</p>
+                              {req.resultPdfUrl && (
+                                <a href={req.resultPdfUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-xs font-bold bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20 transition-colors w-fit">
+                                  <FileText className="w-3.5 h-3.5" /> PDF වාර්තාව බලන්න (View PDF)
+                                </a>
+                              )}
+                              {req.resultImageUrls && req.resultImageUrls.length > 0 && (
+                                <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+                                  {req.resultImageUrls.map((url: string, index: number) => (
+                                    <img key={index} src={url} alt="Result Upload" className="h-24 w-auto rounded border border-space-700" />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
@@ -823,66 +937,7 @@ export default function AdminDashboardPage() {
               </div>
             )}
 
-            {/* =================== COMPLETED TAB =================== */}
-            {activeTab === 'completed' && (
-              <div>
-                <h3 className="text-2xl font-serif font-bold text-gold-400 mb-6">සම්පූර්ණ කළ ඉල්ලුම් (Completed Requests)</h3>
-                {completedRequests.length === 0 ? (
-                  <p className="text-gray-400 text-center py-10">සම්පූර්ණ කළ ඉල්ලුම් නොමැත.</p>
-                ) : (
-                  <div className="space-y-4">
-                    {completedRequests.map((req) => (
-                      <div key={req._id} className="bg-space-900/50 rounded-2xl p-6 border border-green-500/30 space-y-4">
-                        <div className="flex justify-between items-start border-b border-space-800 pb-3">
-                          <div>
-                            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gold-500/10 text-gold-300 border border-gold-500/20 mb-2">
-                              {req.serviceName || "ජ්‍යෝතිෂ්‍ය කියවීම"}
-                            </span>
-                            <h4 className="text-lg font-medium text-white">{req.user?.name}</h4>
-                            <p className="text-xs text-gray-400">{req.user?.email}</p>
-                          </div>
-                          <span className="px-3 py-1 bg-green-500/20 text-green-300 border border-green-500/30 rounded-full text-xs font-semibold">
-                            Completed
-                          </span>
-                        </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-gray-300 bg-space-950/40 p-3 rounded-xl border border-space-850">
-                          <p><strong>උපන් දිනය:</strong> {req.birthDate}</p>
-                          <p><strong>වේලාව:</strong> {req.birthTime}</p>
-                          <p><strong>ස්ථානය:</strong> {req.birthPlace}</p>
-                        </div>
-
-                        {req.horoscopeImageUrl && (
-                          <div>
-                            <span className="text-xs text-gray-400 block mb-1">කේන්දර සටහන:</span>
-                            <a href={req.horoscopeImageUrl} target="_blank" rel="noopener noreferrer" className="text-gold-400 text-xs hover:underline flex items-center gap-1">
-                              <Eye className="w-3.5 h-3.5" /> රූපය බලන්න (View Image)
-                            </a>
-                          </div>
-                        )}
-
-                        <div className="bg-space-950/60 p-4 rounded-xl border border-space-850 mt-2">
-                          <h5 className="text-gold-400 text-xs font-bold mb-2">පලාපල වාර්තාව (Uploaded Result)</h5>
-                          <p className="text-gray-300 text-sm whitespace-pre-wrap">{req.resultText || "ප්‍රතිඵල විස්තරයක් නොමැත."}</p>
-                          {req.resultPdfUrl && (
-                            <a href={req.resultPdfUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-xs font-bold bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20 transition-colors w-fit">
-                              <FileText className="w-3.5 h-3.5" /> PDF වාර්තාව බලන්න (View PDF)
-                            </a>
-                          )}
-                          {req.resultImageUrls && req.resultImageUrls.length > 0 && (
-                            <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
-                              {req.resultImageUrls.map((url: string, index: number) => (
-                                <img key={index} src={url} alt="Result Upload" className="h-24 w-auto rounded border border-space-700" />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* =================== SERVICES TAB =================== */}
             {activeTab === 'services' && (
@@ -1073,6 +1128,11 @@ export default function AdminDashboardPage() {
                   </div>
                 )}
               </div>
+            )}
+
+            {/* =================== SETTINGS TAB =================== */}
+            {activeTab === 'settings' && (
+              <AdminSettings />
             )}
           </div>
         </div>

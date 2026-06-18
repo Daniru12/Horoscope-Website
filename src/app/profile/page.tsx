@@ -7,6 +7,7 @@ import connectToDatabase from "@/lib/mongodb";
 import ServiceRequest from "@/models/ServiceRequest";
 import PaymentUpload from "@/components/PaymentUpload";
 import Service from "@/models/Service";
+import Setting from "@/models/Setting";
 
 const getFallbackPrice = (serviceName: string, services: any[] = []) => {
   if (services && services.length > 0) {
@@ -37,11 +38,12 @@ export default async function ProfilePage() {
     .sort({ createdAt: -1 });
 
   const allServices = await Service.find({ isActive: { $ne: false } });
+  const settings = await Setting.findOne() || {};
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-5xl">
       <div className="flex flex-col md:flex-row gap-8">
-        
+
         <div className="w-full md:w-1/3">
           <div className="bg-space-800/80 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-space-700 shadow-2xl text-center sticky top-24">
             <div className="w-32 h-32 mx-auto rounded-full border-4 border-gold-500/50 mb-6 overflow-hidden bg-space-900 flex items-center justify-center">
@@ -53,8 +55,8 @@ export default async function ProfilePage() {
             </div>
             <h2 className="text-2xl font-serif font-bold text-white mb-2">{session.user.name}</h2>
             <p className="text-gray-400 mb-6">{session.user.email}</p>
-            <Link 
-              href="/service-request" 
+            <Link
+              href="/service-request"
               className="inline-block w-full bg-gold-500 hover:bg-gold-400 text-space-900 font-bold py-3 rounded-xl transition-colors"
             >
               නව සේවා ඉල්ලුමක්
@@ -89,21 +91,19 @@ export default async function ProfilePage() {
                         <h4 className="text-lg font-medium text-white">{req.serviceName || "ජ්‍යෝතිෂ්‍ය කියවීම"}</h4>
                       </div>
                       <div className="text-right">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium block mb-2 ${
-                          req.status === 'pending' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
-                          req.status === 'completed' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
-                          'bg-red-500/20 text-red-300 border border-red-500/30'
-                        }`}>
-                          {req.status === 'pending' ? 'පොරොත්තු (Pending)' : 
-                          req.status === 'completed' ? 'සම්පූර්ණයි (Ready)' : 'අවලංගුයි (Cancelled)'}
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium block mb-2 ${req.status === 'pending' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
+                            req.status === 'completed' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
+                              'bg-red-500/20 text-red-300 border border-red-500/30'
+                          }`}>
+                          {req.status === 'pending' ? 'පොරොත්තු (Pending)' :
+                            req.status === 'completed' ? 'සම්පූර්ණයි (Ready)' : 'අවලංගුයි (Cancelled)'}
                         </span>
                         {req.status === 'completed' && (
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium block ${
-                            req.paymentStatus === 'approved' ? 'bg-green-500/20 text-green-300' :
-                            req.paymentStatus === 'uploaded' ? 'bg-blue-500/20 text-blue-300' : 'bg-yellow-500/20 text-yellow-300'
-                          }`}>
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium block ${req.paymentStatus === 'approved' ? 'bg-green-500/20 text-green-300' :
+                              req.paymentStatus === 'uploaded' ? 'bg-blue-500/20 text-blue-300' : 'bg-yellow-500/20 text-yellow-300'
+                            }`}>
                             {req.paymentStatus === 'approved' ? 'Payment Approved' :
-                            req.paymentStatus === 'uploaded' ? 'Payment Verifying' : 'Payment Required'}
+                              req.paymentStatus === 'uploaded' ? 'Payment Verifying' : 'Payment Required'}
                           </span>
                         )}
                       </div>
@@ -136,7 +136,7 @@ export default async function ProfilePage() {
                     {/* Result and Payment Section */}
                     {req.status === 'completed' && (
                       <div className="mt-6 pt-4 border-t border-space-800 bg-space-950/50 p-4 rounded-xl relative overflow-hidden">
-                        
+
                         <h4 className="text-gold-400 font-bold mb-3 flex items-center gap-2">
                           <FileText className="w-4 h-4" /> පලාපල වාර්තාව (Horoscope Result)
                         </h4>
@@ -145,10 +145,10 @@ export default async function ProfilePage() {
                           <div>
                             <p className="text-gray-300 text-sm whitespace-pre-wrap">{req.resultText || "පලාපල වාර්තාවක් නොමැත."}</p>
                             {req.resultPdfUrl && (
-                              <a 
-                                href={req.resultPdfUrl} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
+                              <a
+                                href={req.resultPdfUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="mt-4 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-5 rounded-xl transition-colors shadow-lg shadow-emerald-900/20"
                               >
                                 <FileText className="w-5 h-5" /> PDF වාර්තාව බාගත කරන්න (Download PDF Report)
@@ -177,14 +177,30 @@ export default async function ProfilePage() {
                         )}
 
                         {req.paymentStatus === 'pending' && (
-                          <div className="absolute inset-0 bg-space-900/60 flex flex-col items-center justify-center p-4 backdrop-blur-[2px]">
-                            <p className="text-white font-medium mb-3 text-center">
-                              වාර්තාව බැලීම සඳහා ගෙවීම් රිසිට්පත උඩුගත කරන්න.
-                              <span className="block text-gold-400 font-bold mt-1 text-sm">
-                                ගෙවිය යුතු මුදල: {(req.service as any)?.price || getFallbackPrice(req.serviceName, allServices)}
-                              </span>
-                            </p>
-                            <PaymentUpload requestId={req._id.toString()} />
+                          <div className="absolute inset-0 bg-space-900/90 flex flex-col items-center p-4 backdrop-blur-md z-10 text-center overflow-y-auto custom-scrollbar">
+                            <div className="my-auto w-full flex flex-col items-center justify-center">
+                              <h5 className="text-white font-bold text-lg mb-1">ගෙවීම් විස්තර (Details)</h5>
+                              <p className="text-gray-300 text-sm mb-3">
+                                පහත ගිණුමට මුදල් බැර කර රිසිට්පත මෙහි උඩුගත කරන්න.
+                              </p>
+
+                              <div className="bg-space-800 p-3 rounded-xl border border-space-700 text-sm text-left mb-4 w-full max-w-sm">
+                                <p className="text-gray-400 mb-1">බැංකුව (Bank): <span className="text-white font-semibold">{settings.bankName || "-"}</span></p>
+                                <p className="text-gray-400 mb-1">ගිණුම් නාමය (Account Name): <span className="text-white font-semibold">{settings.accountName || "-"}</span></p>
+                                <p className="text-gray-400 mb-1">ගිණුම් අංකය (Account Number): <span className="text-gold-400 font-bold">{settings.accountNumber || "-"}</span></p>
+                                {settings.mobileNumber && (
+                                  <p className="text-gray-400 mb-1">දුරකථන අංකය (Mobile): <span className="text-white font-semibold">{settings.mobileNumber}</span></p>
+                                )}
+                                {settings.email && (
+                                  <p className="text-gray-400 mb-2">විද්‍යුත් තැපෑල (Email): <span className="text-white font-semibold">{settings.email}</span></p>
+                                )}
+                                <p className="text-emerald-400 font-bold pt-2 border-t border-space-700 mt-1">
+                                  ගෙවිය යුතු මුදල (Price): {(req.service as any)?.price || getFallbackPrice(req.serviceName, allServices)}
+                                </p>
+                              </div>
+
+                              <PaymentUpload requestId={req._id.toString()} />
+                            </div>
                           </div>
                         )}
 

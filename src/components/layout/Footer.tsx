@@ -1,6 +1,19 @@
 import Link from "next/link";
+import connectToDatabase from "@/lib/mongodb";
+import Setting from "@/models/Setting";
 
-export default function Footer() {
+export default async function Footer() {
+  let settings: any = {};
+  try {
+    await connectToDatabase();
+    settings = (await Setting.findOne()) || {};
+  } catch (error) {
+    console.error("Failed to fetch settings for footer:", error);
+  }
+
+  const email = settings.email || "info@subadra-astrology.com";
+  const mobileNumber = settings.mobileNumber || "+1 (555) 123-4567";
+
   return (
     <footer className="bg-space-800 border-t border-space-700 pt-12 pb-8 mt-auto">
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -29,8 +42,8 @@ export default function Footer() {
         <div>
           <h4 className="font-serif text-lg font-semibold text-gold-300 mb-4">අප අමතන්න</h4>
           <ul className="space-y-2 text-sm text-gray-400">
-            <li>විද්‍යුත් තැපෑල: info@subadra-astrology.com</li>
-            <li>දුරකථන: +1 (555) 123-4567</li>
+            <li>විද්‍යුත් තැපෑල: {email}</li>
+            <li>දුරකථන: {mobileNumber}</li>
             <li>ස්ථානය: 123 Starry Lane, Universe City</li>
           </ul>
         </div>
@@ -42,3 +55,4 @@ export default function Footer() {
     </footer>
   );
 }
+

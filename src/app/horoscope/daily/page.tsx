@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Calendar, Share2, Loader2, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface ZodiacSign {
   name: string;
@@ -122,11 +123,11 @@ export default function DailyHoroscopePage() {
     const targetIdx = ZODIAC_SIGNS.findIndex((s) => s.urlName === activeSign.urlName);
     const currentAngle = rotationY;
     const targetAngle = -targetIdx * 30; // 360 / 12 = 30
-    
+
     // Find the shortest route around the circle
     const diff = ((targetAngle - currentAngle + 180) % 360) - 180;
     const newAngle = currentAngle + diff;
-    
+
     setRotationY(newAngle);
   }, [activeSign]);
 
@@ -375,10 +376,10 @@ export default function DailyHoroscopePage() {
     const rawIndex = -rotationY / anglePerSign;
     let snappedIndex = Math.round(rawIndex) % 12;
     if (snappedIndex < 0) snappedIndex += 12;
-    
+
     const newSign = ZODIAC_SIGNS[snappedIndex];
     const targetAngle = -snappedIndex * 30;
-    
+
     if (newSign.urlName === activeSign.urlName) {
       // Force snap back to the exact target angle if same sign
       const diff = ((targetAngle - rotationY + 180) % 360) - 180;
@@ -418,7 +419,7 @@ export default function DailyHoroscopePage() {
         await navigator.clipboard.writeText(
           `${activeSign.name} ලග්න දෛනික පලාපල: ${horoscopeData.horoscope}\nශුභ වර්ණය: ${horoscopeData.luckyColor}\nශුභ අංකය: ${horoscopeData.luckyNumber}\nමනෝභාවය: ${horoscopeData.mood}`
         );
-        alert("පලාපල විස්තරය පසුරු පුවරුවට (clipboard) පිටපත් කරන ලදී!");
+        toast.success("පලාපල විස්තරය පසුරු පුවරුවට (clipboard) පිටපත් කරන ලදී!");
       }
     } catch (err) {
       console.error("Share error:", err);
@@ -470,7 +471,7 @@ export default function DailyHoroscopePage() {
             <span>තරු වල රහස්‍ය ශක්තිය</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-gold-100 via-gold-300 to-gold-500 tracking-wide">
-            දෛනික පලාපල විශ්ලේෂණය
+            අද දවසේ පලාපල (Today's Horoscope)
           </h1>
           <div className="flex items-center justify-center gap-2 text-gold-300">
             <Calendar className="w-5 h-5" />
@@ -520,11 +521,10 @@ export default function DailyHoroscopePage() {
                     <div
                       key={sign.urlName}
                       onClick={() => handleSignClick(idx)}
-                      className={`absolute inset-0 w-full h-full rounded-2xl flex flex-col items-center justify-center border transition-all duration-500 backface-hidden select-none ${
-                        isActive
+                      className={`absolute inset-0 w-full h-full rounded-2xl flex flex-col items-center justify-center border transition-all duration-500 backface-hidden select-none ${isActive
                           ? "bg-gradient-to-b from-gold-500/25 to-space-950/95 border-gold-400 shadow-[0_0_30px_rgba(212,175,55,0.4)] text-gold-200 scale-105"
                           : "bg-space-900/70 border-space-700/60 text-gray-400 hover:border-gold-500/40 hover:text-white"
-                      }`}
+                        }`}
                       style={{
                         transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
                         cursor: "pointer",
@@ -568,7 +568,7 @@ export default function DailyHoroscopePage() {
           {/* Bottom: Immersive Glassmorphic Horoscope Details */}
           <div className="w-full max-w-3xl mx-auto">
             <div className="bg-space-900/60 backdrop-blur-xl rounded-3xl p-6 md:p-10 border border-space-700/40 shadow-[0_0_50px_rgba(0,0,0,0.6)] relative overflow-hidden min-h-[420px] flex flex-col justify-between transition-all duration-500 hover:border-gold-500/20">
-              
+
               {/* Dynamic light glow corresponding to zodiac sign elements (fire/earth/air/water) */}
               <div
                 className={`absolute top-0 right-0 w-80 h-80 bg-gradient-to-br ${activeSign.glowColor} to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none transition-all duration-1000`}
@@ -586,7 +586,7 @@ export default function DailyHoroscopePage() {
                         {activeSign.name} ලග්නය
                       </h2>
                       <p className="text-gold-400/90 text-sm font-medium tracking-wide">
-                        {activeSign.date} | {activeSign.nameEn}
+                        {activeSign.nameEn}
                       </p>
                     </div>
                   </div>
@@ -624,7 +624,7 @@ export default function DailyHoroscopePage() {
                     <>
                       {/* Detailed Horoscope Text */}
                       <div className="max-w-none mb-6">
-                        <div className="text-base sm:text-lg leading-relaxed text-gray-200 bg-space-950/40 p-5 rounded-2xl border border-space-800/50 shadow-inner font-normal max-h-[170px] sm:max-h-[210px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="text-base sm:text-lg leading-relaxed text-gray-200 bg-space-950/40 p-5 rounded-2xl border border-space-800/50 shadow-inner font-normal">
                           {horoscopeData.horoscope}
                         </div>
                       </div>

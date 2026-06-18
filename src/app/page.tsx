@@ -29,6 +29,8 @@ export default function Home() {
             loop
             muted
             playsInline
+            preload="auto"
+            poster="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop"
             className="absolute inset-0 w-full h-full object-cover z-0"
           >
             <source src="/video/zodiac-bg.mp4" type="video/mp4" />

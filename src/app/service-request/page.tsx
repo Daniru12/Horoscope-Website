@@ -7,6 +7,8 @@ import { Calendar, MapPin, Clock, Upload, Loader2, CheckCircle2, X } from "lucid
 import { TimePicker } from "@poursha98/react-ios-time-picker";
 import "@poursha98/react-ios-time-picker/styles.css";
 
+import toast from "react-hot-toast";
+
 function ServiceRequestForm() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -32,7 +34,8 @@ function ServiceRequestForm() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/login");
+      toast.error("පළමුව ඔබගේ ගිණුමට ලොග් වන්න (First login to your account)");
+      setTimeout(() => router.push("/login"), 1000);
       return;
     }
 
@@ -287,7 +290,10 @@ function ServiceRequestForm() {
                         
                         <button
                           type="button"
-                          onClick={() => setShowTimePicker(false)}
+                          onClick={() => {
+                            if (!birthTime) setBirthTime("12:00 PM");
+                            setShowTimePicker(false);
+                          }}
                           className="mt-6 w-full py-3 bg-gold-500 hover:bg-gold-400 text-space-900 font-bold rounded-xl transition-colors"
                         >
                           තහවුරු කරන්න (Confirm)

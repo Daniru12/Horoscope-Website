@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   description: "සුභද්‍රා ආරත්නායක සමඟින් ඔබේ දෛනික පලාපල, ලග්න විස්තර සහ පෞද්ගලීකරණය කළ ජ්‍යෝතිෂ්‍ය කියවීම් සොයා ගන්න.",
 };
 
+import { Toaster } from "react-hot-toast";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,6 +32,28 @@ export default function RootLayout({
   return (
     <html lang="si" className={`${notoSansSinhala.variable} ${abhayaLibre.variable}`}>
       <body className="galaxy-bg text-foreground min-h-screen flex flex-col antialiased">
+        <Toaster 
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: '#1a1f36',
+              color: '#fff',
+              border: '1px solid #3f4766',
+            },
+            success: {
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
         <AuthProvider>
           <Navbar />
           <main className="flex-grow">

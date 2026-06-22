@@ -44,8 +44,7 @@ export default async function Footer() {
           <ul className="space-y-2 text-sm text-gray-400">
             <li className="break-all">විද්‍යුත් තැපෑල: {email}</li>
             <li>දුරකථන: {mobileNumber}</li>
-            <li>ස්ථානය: 123 Starry Lane, Universe City</li>
-          </ul>
+                      </ul>
         </div>
       </div>
       

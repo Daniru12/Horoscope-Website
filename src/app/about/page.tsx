@@ -28,7 +28,7 @@ export default function AboutPage() {
           </div>
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-6 text-white">
-            සුභද්‍රා ආරත්නායක
+            සුභද්‍රා රත්නායක
           </h1>
           
           <div className="prose prose-invert max-w-none text-gray-300">

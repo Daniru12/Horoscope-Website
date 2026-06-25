@@ -139,47 +139,75 @@ export default function DailyHoroscopePage() {
     if (!ctx) return;
 
     let animationFrameId: number;
+    let isPaused = false;
+
+    // Adaptive star count — mobile gets fewer stars for better perf
+    const isMobile = window.innerWidth < 768;
+    const starCount = isMobile ? 60 : window.innerWidth < 1024 ? 100 : 180;
+
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
+    // Throttle resize to avoid layout thrashing every frame
+    let resizePending = false;
     const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      if (resizePending) return;
+      resizePending = true;
+      requestAnimationFrame(() => {
+        if (!canvas) return;
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        cachedGradient = null; // invalidate cached gradient
+        resizePending = false;
+      });
     };
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
+
+    // Pause animation when tab is hidden — huge battery/CPU saver on mobile
+    const handleVisibility = () => {
+      isPaused = document.hidden;
+      if (!isPaused && !animationFrameId) {
+        render();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
     // Star data generator
     const stars: { x: number; y: number; size: number; alpha: number; speed: number }[] = [];
-    for (let i = 0; i < 180; i++) {
+    for (let i = 0; i < starCount; i++) {
       stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
         size: Math.random() * 1.5 + 0.3,
         alpha: Math.random(),
-        speed: Math.random() * 0.01 + 0.003,
+        speed: Math.random() * 0.008 + 0.002, // slightly slower on mobile
       });
     }
 
     let constellationProgress = 0;
     const constellationSpeed = 0.025;
+    // Cache the background gradient — creating it every frame is expensive
+    let cachedGradient: CanvasGradient | null = null;
 
     const render = () => {
+      if (isPaused) {
+        animationFrameId = 0;
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
 
-      // Deep space radial glow
-      const spaceGlow = ctx.createRadialGradient(
-        width / 2,
-        height / 2,
-        20,
-        width / 2,
-        height / 2,
-        Math.max(width, height) * 0.8
-      );
-      spaceGlow.addColorStop(0, "#08061e");
-      spaceGlow.addColorStop(0.5, "#03020c");
-      spaceGlow.addColorStop(1, "#010005");
-      ctx.fillStyle = spaceGlow;
+      // Deep space radial glow — reuse cached gradient unless size changed
+      if (!cachedGradient) {
+        cachedGradient = ctx.createRadialGradient(
+          width / 2, height / 2, 20,
+          width / 2, height / 2, Math.max(width, height) * 0.8
+        );
+        cachedGradient.addColorStop(0, "#08061e");
+        cachedGradient.addColorStop(0.5, "#03020c");
+        cachedGradient.addColorStop(1, "#010005");
+      }
+      ctx.fillStyle = cachedGradient;
       ctx.fillRect(0, 0, width, height);
 
       // Render floating stars
@@ -268,6 +296,7 @@ export default function DailyHoroscopePage() {
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVisibility);
       cancelAnimationFrame(animationFrameId);
     };
   }, [activeSign]);

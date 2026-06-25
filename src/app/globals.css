@@ -22,11 +22,22 @@
   color: #F8FAFC;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
 body {
   font-family: var(--font-sans), sans-serif;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 h1,
@@ -42,4 +53,111 @@ h6 {
   background-image:
     radial-gradient(circle at 15% 50%, rgba(28, 15, 69, 0.4), transparent 25%),
     radial-gradient(circle at 85% 30%, rgba(46, 27, 91, 0.4), transparent 25%);
+}
+
+/* Mobile: prevent horizontal overflow on all containers */
+.container {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Mobile viewport fix for cards with absolute decorations */
+@media (max-width: 640px) {
+  .rounded-3xl {
+    overflow: hidden;
+  }
+  
+  /* Prevent long Sinhala text from breaking layouts */
+  p, h1, h2, h3, h4, h5, h6, span, li {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* Touch-friendly minimum tap targets */
+  button, a {
+    min-height: 44px;
+  }
+}
+
+/* Custom scrollbar for mobile */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.45);
+}
+
+/* ── Performance: GPU layer promotion for animated elements ─────────────── */
+canvas,
+video {
+  will-change: transform;          /* promote to compositor layer */
+  transform: translateZ(0);        /* force GPU compositing */
+}
+
+/* 3D wheel cards — GPU layer for smooth rotation */
+.preserve-3d {
+  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* ── Performance: skip below-fold rendering until scroll ────────────────── */
+/* Sections after the hero paint lazily — huge FCP/LCP improvement */
+section:not(:first-child),
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px; /* estimated height to avoid reflow */
+}
+
+/* ── Touch: remove 300ms tap delay across the entire app ────────────────── */
+a, button, input, select, textarea, label {
+  touch-action: manipulation;
+}
+
+/* ── Performance: reduce paint on hover for nav links ───────────────────── */
+nav a {
+  text-decoration: none;
+  transform: translateZ(0); /* own compositor layer */
+}
+
+/* ── Skeleton shimmer for image placeholders ────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.03) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.03) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+/* ── Scroll performance ─────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  canvas, video {
+    will-change: auto;
+  }
 }

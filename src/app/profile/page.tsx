@@ -48,7 +48,7 @@ export default async function ProfilePage() {
           <div className="bg-space-800/80 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-space-700 shadow-2xl text-center sticky top-24">
             <div className="w-32 h-32 mx-auto rounded-full border-4 border-gold-500/50 mb-6 overflow-hidden bg-space-900 flex items-center justify-center">
               {session.user.image ? (
-                <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
+                <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" loading="lazy" />
               ) : (
                 <User className="w-16 h-16 text-gold-400" />
               )}
@@ -128,7 +128,7 @@ export default async function ProfilePage() {
                       <div className="mt-4 pt-4 border-t border-space-800">
                         <span className="text-sm text-gray-400 block mb-2">උඩුගත කළ කේන්දර සටහන:</span>
                         <a href={req.horoscopeImageUrl} target="_blank" rel="noopener noreferrer">
-                          <img src={req.horoscopeImageUrl} alt="Horoscope" className="h-24 w-auto rounded-lg border border-space-700 hover:border-gold-500 transition-colors cursor-pointer" />
+                          <img src={req.horoscopeImageUrl} alt="Horoscope" className="h-24 w-auto rounded-lg border border-space-700 hover:border-gold-500 transition-colors cursor-pointer" loading="lazy" />
                         </a>
                       </div>
                     )}

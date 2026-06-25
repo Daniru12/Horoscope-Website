@@ -35,23 +35,23 @@ export default function Home() {
             <Star className="w-4 h-4" />
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 font-serif leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 font-serif leading-tight">
             තරු පෙන්වන මගෙන් <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 to-gold-500">
               ජීවිතය ජයගන්න
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl">
-            සුභද්‍රා ආරත්නායක ජ්‍යෝතිෂ්‍ය සේවයට සාදරයෙන් පිළිගනිමු. සත්‍ය ජ්‍යෝතිෂ්‍ය මාර්ගෝපදේශ තුලින් ඔබේ ජීවිතයේ සැබෑ අරමුණ සහ විශ්වයේ රහස් සොයාගන්න.
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-10 max-w-2xl">
+            සුභද්‍රා රත්නායක ජ්‍යෝතිෂ්‍ය සේවයට සාදරයෙන් පිළිගනිමු. සත්‍ය ජ්‍යෝතිෂ්‍ය මාර්ගෝපදේශ තුලින් ඔබේ ජීවිතයේ සැබෑ අරමුණ සහ විශ්වයේ රහස් සොයාගන්න.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/horoscope/daily" className="px-8 py-4 bg-gold-500 hover:bg-gold-400 text-space-900 font-bold rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <Link href="/horoscope/daily" className="px-6 sm:px-8 py-3 sm:py-4 bg-gold-500 hover:bg-gold-400 text-space-900 font-bold rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 text-sm sm:text-base">
               දෛනික පලාපල බලන්න
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
-            <Link href="/services" className="px-8 py-4 bg-space-800 hover:bg-space-700 border border-gold-500/30 text-gold-100 font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
+            <Link href="/services" className="px-6 sm:px-8 py-3 sm:py-4 bg-space-800 hover:bg-space-700 border border-gold-500/30 text-gold-100 font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base">
               වේලාවක් වෙන්කරගන්න
             </Link>
           </div>
@@ -59,8 +59,8 @@ export default function Home() {
       </section>
 
       {/* Quick Navigation Cards */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-16 -mt-10 relative z-30">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="w-full max-w-6xl mx-auto px-4 py-10 sm:py-16 -mt-6 sm:-mt-10 relative z-30">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           {[
             { title: "දෛනික පලාපල", icon: Sun, desc: "අද දින ඔබගේ පලාපල.", link: "/horoscope/daily" },
             { title: "සතිපතා පලාපල", icon: Moon, desc: "සතියේ ග්‍රහ හැසිරීම් සමගින් සැලසුම් කරන්න.", link: "/horoscope/weekly" },
@@ -87,14 +87,14 @@ export default function Home() {
           <p className="text-gray-400 max-w-2xl mx-auto">ඔබගේ දෛනික පලාපල සහ සුවිශේෂී ලක්ෂණ දැනගැනීම සඳහා ඔබගේ ලග්නය තෝරන්න.</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {ZODIAC_SIGNS.map((sign, i) => (
-            <Link href={`/zodiac/${sign.urlName}`} key={i} className="flex flex-col items-center justify-center p-6 rounded-2xl bg-space-800/40 border border-space-700 hover:bg-space-700 hover:border-gold-500/30 transition-all duration-300 group">
-              <span className="text-4xl mb-3 group-hover:scale-125 group-hover:text-gold-400 transition-all duration-300">
+            <Link href={`/zodiac/${sign.urlName}`} key={i} className="flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl bg-space-800/40 border border-space-700 hover:bg-space-700 hover:border-gold-500/30 transition-all duration-300 group">
+              <span className="text-3xl sm:text-4xl mb-2 sm:mb-3 group-hover:scale-125 group-hover:text-gold-400 transition-all duration-300">
                 {sign.icon}
               </span>
-              <h3 className="font-serif font-bold text-lg">{sign.name}</h3>
-              <p className="text-xs text-gray-500">{sign.date}</p>
+              <h3 className="font-serif font-bold text-base sm:text-lg">{sign.name}</h3>
+              <p className="text-xs text-gray-500 text-center mt-1 hidden sm:block">{sign.date}</p>
             </Link>
           ))}
         </div>

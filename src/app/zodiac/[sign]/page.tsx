@@ -57,21 +57,21 @@ export default async function ZodiacSignPage({ params }: { params: Promise<{ sig
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
         
         <div className="relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-10 gap-6">
-            <div className="flex items-center gap-6 text-center md:text-left">
-              <span className="text-7xl text-gold-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.3)] select-none">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start mb-8 sm:mb-10 gap-4">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <span className="text-5xl sm:text-7xl text-gold-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.3)] select-none flex-shrink-0">
                 {signData.iconSymbol}
               </span>
               <div>
-                <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-2">{signData.name} ලග්නය</h1>
-                <p className="text-gold-400 text-lg">{signData.date}</p>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white mb-1 sm:mb-2">{signData.name} ලග්නය</h1>
+                <p className="text-gold-400 text-base sm:text-lg">{signData.date}</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <span className="px-4 py-2 rounded-full bg-space-700/80 border border-space-600 text-sm text-gray-300 font-medium">
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1.5 rounded-full bg-space-700/80 border border-space-600 text-xs sm:text-sm text-gray-300 font-medium">
                 මූලද්‍රව්‍යය: {signData.element}
               </span>
-              <span className="px-4 py-2 rounded-full bg-space-700/80 border border-space-600 text-sm text-gray-300 font-medium">
+              <span className="px-3 py-1.5 rounded-full bg-space-700/80 border border-space-600 text-xs sm:text-sm text-gray-300 font-medium">
                 පාලකයා: {signData.ruler}
               </span>
             </div>

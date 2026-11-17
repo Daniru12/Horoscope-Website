@@ -8,10 +8,10 @@ export default function AboutPage() {
         
         {/* Profile Image Column */}
         <div className="w-full md:w-5/12 relative">
-          <div className="aspect-[4/5] rounded-3xl overflow-hidden relative border-2 border-gold-500/30 max-w-xs mx-auto md:max-w-none">
+          <div className="aspect-[4/3] sm:aspect-[4/5] rounded-3xl overflow-hidden relative border-2 border-gold-500/30 max-w-xs mx-auto md:max-w-none">
             {/* Placeholder for astrologer image */}
             <div className="absolute inset-0 bg-space-800 flex items-center justify-center">
-              <span className="text-6xl">👤</span>
+              <span className="text-gold-400/40 font-serif text-7xl">සු</span>
             </div>
           </div>
           {/* Experience badge - shown inline on mobile, absolute on desktop */}
@@ -47,7 +47,7 @@ export default function AboutPage() {
             </div>
             
             <p className="leading-relaxed mb-6">
-              ඔබ ඔබේ වෘත්තියේ පැහැදිලි බවක් අපේක්ෂා කරන්නේද, ඔබේ සහකරුවා සොයමින් සිටියද, නැතහොත් ඔබව වඩාත් හොඳින් අවබෝධ කර ගැනීමට අවශ්‍ය වුවද, මගේ පෞද්ගලීකරණය කළ කියවීම් විශේෂයෙන් ඔබට ගැලපෙන ප්‍රායෝගික, ක්‍රියාකාරී අවබෝධයක් ලබා දෙයි.
+              ඔබ ඔබේ වෘත්තියේ පැහැදිලි බවක් අපේක්ෂා කරන්නේද, ඔබේ සහකරුවා සොයමින් සිටියද, නැතහොත් ඔබව වඩාත් හොඳින් අවබෝධ කර ගැනීමට අවශ්‍ය වුවද, මා පෞද්ගලිකව සකස් කරන කියවීම් විශේෂයෙන් ඔබට ගැලපෙන ප්‍රායෝගික, ක්‍රියාකාරී අවබෝධයක් ලබා දෙයි.
             </p>
           </div>
         </div>

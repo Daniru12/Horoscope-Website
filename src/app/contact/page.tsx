@@ -147,7 +147,7 @@ export default function ContactPage() {
                         ? "border-red-500 focus:border-red-400 ring-1 ring-red-500/50"
                         : "border-space-600 focus:border-gold-500"
                     }`}
-                    placeholder="ඔබගේ නම ඇතුලත් කරන්න"
+                    placeholder="ඔබගේ නම ඇතුළත් කරන්න"
                   />
                   {nameError && (
                     <p className="flex items-center gap-1.5 text-xs text-red-400 mt-0.5">

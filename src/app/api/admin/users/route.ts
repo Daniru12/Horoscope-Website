@@ -17,7 +17,8 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Forbidden: Admin access required" }, { status: 403 });
     }
 
-    const users = await User.find().sort({ createdAt: -1 });
+    // Never send password hashes to the browser.
+    const users = await User.find().select("-password").sort({ createdAt: -1 });
 
     return NextResponse.json({ users }, { status: 200 });
   } catch (error) {

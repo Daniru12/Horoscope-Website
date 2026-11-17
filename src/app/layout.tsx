@@ -1,9 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans_Sinhala, Abhaya_Libre } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import AuthProvider from "@/components/AuthProvider";
+import CosmicBackground from "@/components/CosmicBackground";
+import SmoothScroll from "@/components/SmoothScroll";
+import SiteChrome from "@/components/layout/SiteChrome";
 
 const notoSansSinhala = Noto_Sans_Sinhala({
   variable: "--font-inter",
@@ -22,9 +25,15 @@ const abhayaLibre = Abhaya_Libre({
 });
 
 export const metadata: Metadata = {
-  title: "සුභද්‍රා ආරත්නායක ජ්‍යෝතිෂ්‍ය | ඔබගේ තරු මාර්ගෝපදේශකයා",
-  description: "සුභද්‍රා ආරත්නායක සමඟින් ඔබේ දෛනික පලාපල, ලග්න විස්තර සහ පෞද්ගලීකරණය කළ ජ්‍යෝතිෂ්‍ය කියවීම් සොයා ගන්න.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
+  title: "සුභද්‍රා රත්නායක ජ්‍යෝතිෂ්‍ය | ඔබගේ තරු මාර්ගෝපදේශකයා",
+  description: "සුභද්‍රා රත්නායක සමඟින් ඔබේ දෛනික පලාපල, ලග්න විස්තර සහ පෞද්ගලිකව සකස් කළ ජ්‍යෝතිෂ්‍ය කියවීම් සොයා ගන්න.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#04070f",
 };
 
 import { Toaster } from "react-hot-toast";
@@ -45,14 +54,14 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://horoscope-app-api.vercel.app" />
         <link rel="dns-prefetch" href="https://translate.googleapis.com" />
       </head>
-      <body className="galaxy-bg text-foreground min-h-screen flex flex-col antialiased">
+      <body className="text-foreground min-h-screen flex flex-col antialiased">
         <Toaster 
-          position="bottom-right"
+          position="top-center"
           toastOptions={{
             style: {
-              background: '#1a1f36',
+              background: '#0a1020',
               color: '#fff',
-              border: '1px solid #3f4766',
+              border: '1px solid rgba(231,198,90,0.3)',
             },
             success: {
               iconTheme: {
@@ -68,12 +77,14 @@ export default function RootLayout({
             },
           }}
         />
+        <CosmicBackground />
+        <SmoothScroll />
         <AuthProvider>
-          <Navbar />
+          <SiteChrome><Navbar /></SiteChrome>
           <main className="flex-grow">
             {children}
           </main>
-          <Footer />
+          <SiteChrome><Footer /></SiteChrome>
         </AuthProvider>
       </body>
     </html>

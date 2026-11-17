@@ -46,7 +46,7 @@ export default function SignUpPage() {
         <div className="relative z-10">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-serif font-bold text-white mb-2">ලියාපදිංචි වන්න</h1>
-            <p className="text-gray-400 text-sm">නව ගිණුමක් සාදන්න (Create a new account)</p>
+            <p className="text-gray-400 text-sm">නව ගිණුමක් සාදන්න</p>
           </div>
 
           {error && (
@@ -119,7 +119,7 @@ export default function SignUpPage() {
           <p className="mt-8 text-center text-sm text-gray-400">
             දැනටමත් ගිණුමක් තිබේද?{" "}
             <Link href="/login" className="text-gold-400 hover:text-gold-300 transition-colors font-medium">
-              ඇතුල් වන්න
+              ඇතුළු වන්න
             </Link>
           </p>
         </div>

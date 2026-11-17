@@ -52,14 +52,14 @@ export default async function ZodiacSignPage({ params }: { params: Promise<{ sig
         <ArrowLeft className="w-4 h-4" /> සියලුම ලග්න වෙත
       </Link>
 
-      <div className="bg-space-800/60 backdrop-blur-md rounded-3xl p-6 md:p-12 border border-space-700 shadow-2xl relative overflow-hidden">
+      <div className="glass rounded-3xl p-6 md:p-12 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
         
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start mb-8 sm:mb-10 gap-4">
             <div className="flex items-center gap-4 sm:gap-6">
-              <span className="text-5xl sm:text-7xl text-gold-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.3)] select-none flex-shrink-0">
+              <span className="glyph text-5xl sm:text-7xl text-gold-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.3)] select-none flex-shrink-0">
                 {signData.iconSymbol}
               </span>
               <div>
@@ -92,7 +92,7 @@ export default async function ZodiacSignPage({ params }: { params: Promise<{ sig
             </div>
             
             <div className="prose prose-invert max-w-none">
-              <p className="text-lg leading-relaxed text-gray-200">
+              <p className="text-base sm:text-lg leading-relaxed text-gray-200">
                 {horoscopeText}
               </p>
             </div>

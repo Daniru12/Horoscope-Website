@@ -120,7 +120,6 @@ export default function AdminSettings() {
 
   return (
     <div>
-      <h3 className="text-2xl font-serif font-bold text-gold-400 mb-6">සැකසුම් (Settings)</h3>
 
       <div className="space-y-8">
         {/* Bank & Contact Details Form */}

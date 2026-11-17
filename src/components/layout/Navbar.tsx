@@ -1,71 +1,94 @@
 import Link from "next/link";
-import { Menu, Search, User, LogOut } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import { auth, signOut } from "@/auth";
-import MobileMenu from "./MobileMenu";
+import BottomNav from "./BottomNav";
+import NavLinks from "./NavLinks";
 
 export default async function Navbar() {
   const session = await auth();
+  const isAdmin = (session as any)?.user?.role === "admin";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-space-700 bg-space-900/80 backdrop-blur-md">
-      <div className="container mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2">
-        <Link href="/" className="flex items-center gap-2 min-w-0 flex-shrink-0">
-          <img src="/horoscope-result-1.png" alt="Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-gold-500/50 flex-shrink-0" />
-          <span className="font-serif text-base sm:text-xl font-bold tracking-wider text-gold-400 hidden xs:block sm:block truncate">
-            සුභද්‍රා ජ්‍යෝතිෂ්‍ය
-          </span>
-        </Link>
-        
-        <nav className="hidden md:flex gap-6 items-center text-sm font-medium">
-          <Link href="/" className="hover:text-gold-400 transition-colors">මුල් පිටුව</Link>
-          <Link href="/zodiac" className="hover:text-gold-400 transition-colors">ලග්න විස්තර</Link>
-          <Link href="/horoscope/daily" className="hover:text-gold-400 transition-colors">දෛනික පලාපල</Link>
-          <Link href="/services" className="hover:text-gold-400 transition-colors">සේවාවන්</Link>
-          {session && (
-            <>
-              {(session as any).user?.role === 'admin' && (
-                <Link href="/admin" className="hover:text-gold-400 text-green-400 transition-colors font-bold">Admin Panel</Link>
-              )}
-            </>
-          )}
-        </nav>
+    <>
+      <header className="sticky top-0 z-50 w-full border-b border-[var(--hairline)] bg-space-900/60 backdrop-blur-xl">
+        <div className="container mx-auto px-4 sm:px-6 h-14 lg:h-[68px] flex items-center justify-between gap-4 max-w-7xl">
+          <Link href="/" className="flex items-center gap-3 min-w-0 flex-shrink-0 group">
+            <img
+              src="/horoscope-result-1.png"
+              alt="සුභද්‍රා ජ්‍යෝතිෂ්‍ය ලාංඡනය"
+              className="w-9 h-9 lg:w-10 lg:h-10 rounded-full object-cover ring-1 ring-gold-500/50 ring-offset-2 ring-offset-space-900 flex-shrink-0 transition-transform duration-700 group-hover:rotate-[360deg]"
+            />
+            <span className="font-serif text-lg lg:text-xl font-bold tracking-wide text-gold-gradient truncate">
+              සුභද්‍රා ජ්‍යෝතිෂ්‍ය
+            </span>
+          </Link>
 
-        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-          <button className="p-2 hover:bg-space-800 rounded-full transition-colors hidden md:block">
-            <Search className="w-5 h-5" />
-          </button>
-          
-          {session ? (
-            <div className="hidden md:flex items-center gap-3">
-              <Link href={(session as any).user?.role === 'admin' ? "/admin" : "/profile"} className="flex items-center gap-2 hover:text-gold-400 transition-colors">
-                {session.user?.image ? (
-                  <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full border border-gold-500 flex-shrink-0" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full border border-gold-500 flex items-center justify-center bg-space-800 flex-shrink-0">
-                    <User className="w-4 h-4 text-gold-400" />
-                  </div>
-                )}
-                <span className="text-sm hidden lg:block">{session.user?.name}</span>
+          <nav className="hidden lg:flex gap-8 items-center whitespace-nowrap text-[0.95rem] font-medium">
+            <NavLinks />
+            {isAdmin && (
+              <Link href="/admin" className="nav-link !text-emerald-300 font-bold">
+                Admin Panel
               </Link>
-              <form action={async () => {
-                "use server";
-                await signOut();
-              }}>
-                <button type="submit" className="p-2 hover:bg-space-800 rounded-full transition-colors text-red-400 hover:text-red-300">
-                  <LogOut className="w-5 h-5" />
-                </button>
-              </form>
-            </div>
-          ) : (
-            <Link href="/login" className="hidden md:flex items-center gap-2 px-3 py-2 bg-gold-500 hover:bg-gold-400 text-space-900 rounded-full font-medium transition-colors text-sm">
-              <User className="w-4 h-4" />
-              <span>ඇතුල් වන්න</span>
-            </Link>
-          )}
+            )}
+          </nav>
 
-          <MobileMenu session={session} />
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {session ? (
+              <>
+                <Link
+                  href={isAdmin ? "/admin" : "/profile"}
+                  className="flex items-center gap-2 hover:text-gold-300 transition-colors"
+                  aria-label="මගේ ගිණුම"
+                >
+                  {session.user?.image ? (
+                    <img src={session.user.image} alt="" className="w-8 h-8 rounded-full ring-1 ring-gold-500 flex-shrink-0" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full ring-1 ring-gold-500 flex items-center justify-center bg-space-800 flex-shrink-0">
+                      <User className="w-4 h-4 text-gold-400" />
+                    </div>
+                  )}
+                  <span className="text-sm hidden xl:block">{session.user?.name}</span>
+                </Link>
+                <form
+                  className="hidden lg:block"
+                  action={async () => {
+                    "use server";
+                    await signOut();
+                  }}
+                >
+                  <button
+                    type="submit"
+                    aria-label="ඉවත් වන්න"
+                    className="p-2 hover:bg-white/5 rounded-full transition-colors text-red-300 hover:text-red-200"
+                  >
+                    <LogOut className="w-5 h-5" />
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                {/* Phones: a compact icon. Desktop: the full button (wrapped, because .btn-ghost sets display). */}
+                <Link
+                  href="/login"
+                  aria-label="ඇතුළු වන්න"
+                  className="lg:hidden grid place-items-center w-10 h-10 rounded-full border border-[var(--hairline-strong)] text-gold-200"
+                >
+                  <User className="w-[18px] h-[18px]" />
+                </Link>
+                <span className="hidden lg:block">
+                  <Link href="/login" className="btn-ghost !py-2 !px-5 text-sm">
+                    <User className="w-4 h-4" />
+                    <span>ඇතුළු වන්න</span>
+                  </Link>
+                </span>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Outside <header>: the header's backdrop blur would trap fixed children inside the bar. */}
+      <BottomNav session={session as any} />
+    </>
   );
 }

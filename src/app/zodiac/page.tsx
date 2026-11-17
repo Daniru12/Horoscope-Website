@@ -4,9 +4,9 @@ import { ZODIAC_SIGNS } from "@/lib/zodiacData";
 
 export default function ZodiacPage() {
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="container mx-auto max-w-7xl px-4 sm:px-6 py-20">
       <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6">ලග්න විස්තරය</h1>
+        <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 text-gold-gradient">ලග්න විස්තරය</h1>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           සෑම ලග්නයකම ඇති සුවිශේෂී ලක්ෂණ, ශක්තීන් සහ පාලක ග්‍රහයන් ගැන දැනගන්න.
         </p>
@@ -14,9 +14,9 @@ export default function ZodiacPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {ZODIAC_SIGNS.map((sign, i) => (
-          <div key={i} className="group p-6 md:p-8 rounded-2xl bg-space-800/60 backdrop-blur-md border border-space-700 hover:border-gold-500/50 transition-all duration-500 flex flex-col h-full">
+          <div key={i} className="group glass spotlight p-5 md:p-8 rounded-3xl transition-all duration-500 hover:-translate-y-1.5 flex flex-col h-full">
             <div className="flex justify-between items-start mb-6">
-              <span className="text-5xl text-gold-400 group-hover:scale-110 transition-transform duration-300 select-none">
+              <span className="glyph text-5xl text-gold-400 group-hover:scale-110 transition-transform duration-300 select-none">
                 {sign.iconSymbol}
               </span>
               <div className="text-right">
@@ -29,7 +29,7 @@ export default function ZodiacPage() {
             <h2 className="text-2xl font-serif font-bold mb-2">{sign.name} ලග්නය</h2>
             <p className="text-gold-300 text-sm mb-4">{sign.date}</p>
             
-            <p className="text-gray-400 mb-6 flex-grow leading-relaxed">
+            <p className="text-gray-400 mb-5 flex-grow leading-relaxed line-clamp-5">
               පාලක ග්‍රහයා: <span className="text-white font-semibold">{sign.ruler}</span><br/><br/>
               {sign.personality.substring(0, 110)}...
             </p>

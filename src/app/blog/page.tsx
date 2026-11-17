@@ -6,21 +6,21 @@ const POSTS = [
     title: "ඔබේ ලග්නයේ පෞරුෂත්වය කුමක්ද?",
     excerpt: "සෑම ලග්නයකම මූලික ලක්ෂණ, ශක්තීන් සහ දුර්වලතා පිළිබඳව ගැඹුරින් අධ්‍යයනය කරන්න.",
     date: "May 2, 2026",
-    author: "සුභද්‍රා ආරත්නායක",
+    author: "සුභද්‍රා රත්නායක",
     category: "ජ්‍යෝතිෂ්‍ය මූලධර්ම"
   },
   {
     title: "2026 වර්ෂය සඳහා පලාපල",
     excerpt: "ආදරය, රැකියාව සහ පෞද්ගලික වර්ධනය සම්බන්ධයෙන් මෙම වසරේ තරු ඔබට ගෙන එන්නේ කුමක්දැයි සොයා බලන්න.",
     date: "April 28, 2026",
-    author: "සුභද්‍රා ආරත්නායක",
+    author: "සුභද්‍රා රත්නායක",
     category: "අනාවැකි"
   },
   {
     title: "ග්‍රහයන් ඔබේ දෛනික ජීවිතයට බලපාන ආකාරය",
     excerpt: "ග්‍රහ ගෝචර සහ බුධ වක්‍ර වීම ඇත්ත වශයෙන්ම ඔබේ සන්නිවේදනයට බලපාන ආකාරය තේරුම් ගැනීම.",
     date: "April 15, 2026",
-    author: "සුභද්‍රා ආරත්නායක",
+    author: "සුභද්‍රා රත්නායක",
     category: "ග්‍රහ ගමන"
   }
 ];
@@ -29,7 +29,7 @@ export default function BlogPage() {
   return (
     <div className="container mx-auto px-4 py-16 max-w-6xl">
       <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6">ජ්‍යෝතිෂ්‍ය ලිපි</h1>
+        <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 text-gold-gradient">ජ්‍යෝතිෂ්‍ය ලිපි</h1>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           ලග්න විස්තර, ග්‍රහ හැසිරීම් සහ ආධ්‍යාත්මික වර්ධනය පිළිබඳ අපගේ නවතම ලිපි කියවන්න.
         </p>
@@ -37,8 +37,8 @@ export default function BlogPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {POSTS.map((post, i) => (
-          <article key={i} className="bg-space-800/60 border border-space-700 rounded-2xl overflow-hidden hover:border-gold-500/50 transition-all duration-300 flex flex-col group">
-            <div className="h-48 bg-space-700 w-full relative overflow-hidden">
+          <article key={i} className="glass spotlight rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-1 flex flex-col group">
+            <div className="h-28 sm:h-44 bg-space-700 w-full relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-space-800 to-transparent z-10"></div>
               {/* Placeholder for blog image */}
               <div className="w-full h-full bg-space-600 flex items-center justify-center text-space-400 font-serif text-2xl opacity-50 group-hover:scale-105 transition-transform duration-500">

@@ -3,6 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { auth } from "@/auth";
 import connectToDatabase from "@/lib/mongodb";
 import ServiceRequest from "@/models/ServiceRequest";
+import { sendSms } from "@/lib/sms";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -44,14 +45,19 @@ export async function POST(req: Request) {
     await connectToDatabase();
     
     const request = await ServiceRequest.findOne({ _id: requestId, user: session.user.id });
-    if (request) {
+    // Don't let an already-approved payment be overwritten or sent back for re-verification
+    if (request && request.paymentStatus !== 'approved') {
       request.paymentReceiptUrl = paymentReceiptUrl;
       request.paymentStatus = 'uploaded';
       await request.save();
+
+      await sendSms(
+        `[PAYMENT RECEIVED]\nName: ${session.user.name || session.user.email || "User"}\nMobile: ${request.contactNumber || "-"}\nService: ${request.serviceName}\nPlease verify in the admin panel.`
+      );
     }
 
     // Redirect back to profile page
-    return NextResponse.redirect(new URL("/profile?success=payment_uploaded", req.url), 303);
+    return NextResponse.redirect(new URL(`/profile/requests/${encodeURIComponent(requestId)}`, req.url), 303);
   } catch (error) {
     console.error("Payment upload error:", error);
     return NextResponse.redirect(new URL("/profile?error=upload_failed", req.url), 303);

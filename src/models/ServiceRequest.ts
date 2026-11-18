@@ -7,6 +7,8 @@ export interface IServiceRequest extends Document {
   birthDate: string;
   birthTime: string;
   birthPlace: string;
+  contactNumber?: string;
+  note?: string;
   horoscopeImageUrl?: string;
   status: 'pending' | 'completed' | 'cancelled';
   resultText?: string;
@@ -46,6 +48,15 @@ const ServiceRequestSchema: Schema = new Schema(
     birthPlace: {
       type: String,
       required: true,
+    },
+    contactNumber: {
+      type: String,
+      required: false,
+    },
+    note: {
+      type: String,
+      required: false,
+      maxlength: 500,
     },
     horoscopeImageUrl: {
       type: String,

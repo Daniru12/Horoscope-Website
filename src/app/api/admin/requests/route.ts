@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     }
 
     const requests = await ServiceRequest.find()
-      .populate('user', 'name email image')
+      .populate('user', 'name email image phone')
       .populate('service')
       .sort({ createdAt: -1 });
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import ServiceRequest from "@/models/ServiceRequest";
+import { sendSms } from "@/lib/sms";
 import { auth } from "@/auth";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -26,10 +27,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ message: "Request not found or unauthorized" }, { status: 404 });
     }
 
+    if (request.paymentStatus === 'approved') {
+      return NextResponse.json({ message: "Payment already approved" }, { status: 409 });
+    }
+
     request.paymentReceiptUrl = paymentReceiptUrl;
     request.paymentStatus = 'uploaded';
-    
+
     await request.save();
+
+    await sendSms(
+      `[PAYMENT RECEIVED]\nName: ${session.user.name || session.user.email || "User"}\nMobile: ${request.contactNumber || "-"}\nService: ${request.serviceName}\nPlease verify in the admin panel.`
+    );
 
     return NextResponse.json({ message: "Payment receipt uploaded successfully", request }, { status: 200 });
   } catch (error) {

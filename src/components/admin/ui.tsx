@@ -21,21 +21,30 @@ export const btnGreen =
 /* ── Record stage ─────────────────────────────────────────────────────────
    Every request is in exactly one stage, derived from status + paymentStatus,
    so the admin always sees "what happens next" for a record. */
-export type Stage = "awaiting_payment" | "verify_payment" | "in_progress" | "completed" | "cancelled";
+export type Stage = "new" | "awaiting_payment" | "verify_payment" | "in_progress" | "completed" | "cancelled";
 
+/* Real customer flow: request → admin sends result → customer pays → admin verifies receipt.
+   A receipt upload always wins, even after the result was sent. */
 export function stageOf(r: any): Stage {
-  if (r.status === "completed") return "completed";
   if (r.status === "cancelled") return "cancelled";
   if (r.paymentStatus === "uploaded") return "verify_payment";
+  if (r.status === "completed") return r.paymentStatus === "approved" ? "completed" : "awaiting_payment";
   if (r.paymentStatus === "approved") return "in_progress";
-  return "awaiting_payment";
+  return "new";
 }
 
 export const STAGE_META: Record<Stage, { label: string; short: string; hint: string; cls: string; dot: string }> = {
+  new: {
+    label: "අලුත් ඉල්ලීම",
+    short: "අලුත්",
+    hint: "අලුත් ඉල්ලීමක් — උපත් විස්තර පරීක්ෂා කර පලාපල වාර්තාව යවන්න.",
+    cls: "bg-violet-400/15 text-violet-200",
+    dot: "bg-violet-400",
+  },
   awaiting_payment: {
     label: "ගෙවීම බලාපොරොත්තුවෙන්",
     short: "ගෙවීම නැත",
-    hint: "පාරිභෝගිකයා තවම රිසිට්පත යවා නැත.",
+    hint: "වාර්තාව යවා ඇත. පාරිභෝගිකයා රිසිට්පත යවන තෙක් රැඳී සිටින්න.",
     cls: "bg-slate-400/10 text-slate-300",
     dot: "bg-slate-400",
   },
@@ -63,7 +72,7 @@ export const STAGE_META: Record<Stage, { label: string; short: string; hint: str
   cancelled: { label: "අවලංගුයි", short: "අවලංගුයි", hint: "", cls: "bg-red-400/12 text-red-300", dot: "bg-red-400" },
 };
 
-export const STAGE_ORDER: Stage[] = ["verify_payment", "in_progress", "awaiting_payment", "completed", "cancelled"];
+export const STAGE_ORDER: Stage[] = ["verify_payment", "new", "in_progress", "awaiting_payment", "completed", "cancelled"];
 
 export function StageBadge({ stage, short = false }: { stage: Stage; short?: boolean }) {
   const m = STAGE_META[stage];
@@ -216,6 +225,7 @@ export function Sheet({
   subtitle,
   children,
   footer,
+  full = false,
 }: {
   open: boolean;
   onClose: () => void;
@@ -223,6 +233,8 @@ export function Sheet({
   subtitle?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
+  /** On desktop, fill the whole screen (content centered, max-w-5xl) instead of a 560px side panel. */
+  full?: boolean;
 }) {
   useOverlay(open, onClose);
   const desktop = useIsDesktop();
@@ -240,7 +252,9 @@ export function Sheet({
           <motion.aside
             className={
               desktop
-                ? "absolute right-0 top-0 h-full w-[560px] bg-[#0a0f1e] border-l border-white/[0.08] flex flex-col shadow-2xl"
+                ? full
+                  ? "absolute inset-0 bg-[#0a0f1e] flex flex-col"
+                  : "absolute right-0 top-0 h-full w-[560px] bg-[#0a0f1e] border-l border-white/[0.08] flex flex-col shadow-2xl"
                 : "absolute inset-x-0 bottom-0 top-3 bg-[#0a0f1e] rounded-t-[28px] border-t border-white/[0.08] flex flex-col shadow-2xl"
             }
             initial={desktop ? { x: "100%" } : { y: "100%" }}
@@ -249,16 +263,20 @@ export function Sheet({
             transition={{ type: "tween", duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
           >
             {!desktop && <div className="mx-auto mt-2.5 h-1.5 w-10 rounded-full bg-white/20" aria-hidden="true" />}
-            <header className="flex items-start gap-3 px-5 pt-4 pb-4 border-b border-white/[0.06]">
-              <div className="min-w-0 flex-1">{title}{subtitle}</div>
-              <button onClick={onClose} aria-label="වසන්න" className="grid place-items-center w-10 h-10 -mr-2 rounded-full text-gray-300 hover:bg-white/10">
-                <X className="w-5 h-5" />
-              </button>
+            <header className="border-b border-white/[0.06]">
+              <div className={`flex items-start gap-3 px-5 pt-4 pb-4 ${full ? "mx-auto w-full max-w-5xl lg:px-8" : ""}`}>
+                <div className="min-w-0 flex-1">{title}{subtitle}</div>
+                <button onClick={onClose} aria-label="වසන්න" className="grid place-items-center w-10 h-10 -mr-2 rounded-full text-gray-300 hover:bg-white/10">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </header>
-            <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5">{children}</div>
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className={`px-5 py-5 ${full ? "mx-auto w-full max-w-5xl lg:px-8 lg:py-8" : ""}`}>{children}</div>
+            </div>
             {footer && (
-              <footer className="px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-white/[0.06] bg-[#0a0f1e]">
-                {footer}
+              <footer className="border-t border-white/[0.06] bg-[#0a0f1e] pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                <div className={`px-5 pt-3 ${full ? "mx-auto w-full max-w-5xl lg:px-8 lg:flex lg:justify-end [&>*]:lg:!w-auto [&>*]:lg:min-w-[320px]" : ""}`}>{footer}</div>
               </footer>
             )}
           </motion.aside>

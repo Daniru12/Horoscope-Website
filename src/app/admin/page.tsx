@@ -61,6 +61,15 @@ export default function AdminDashboardPage() {
     else if (status === "authenticated") refreshAll();
   }, [status, router, refreshAll]);
 
+  // Pick up new customer requests without a manual refresh (every 60s, only while the tab is visible).
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") fetchRequests().catch(() => {});
+    }, 60000);
+    return () => clearInterval(id);
+  }, [status, fetchRequests]);
+
   if (loading || status === "loading") {
     return (
       <div className="min-h-[100dvh] bg-[#060a14] grid place-items-center">

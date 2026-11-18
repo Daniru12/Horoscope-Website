@@ -16,7 +16,7 @@ const TABS = [
   { href: "/services", label: "සේවා", icon: Sparkles },
 ];
 
-const MORE_PATHS = ["/about", "/blog", "/contact", "/profile", "/login", "/signup"];
+const MORE_PATHS = ["/about", "/blog", "/contact"];
 
 const isActive = (path: string, href: string) => (href === "/" ? path === "/" : path.startsWith(href));
 
@@ -27,6 +27,8 @@ export default function BottomNav({ session }: { session: SessionLike }) {
   const user = session?.user;
   const isAdmin = user?.role === "admin";
   const moreActive = MORE_PATHS.some((p) => pathname.startsWith(p));
+  const accountHref = user ? (isAdmin ? "/admin" : "/profile") : "/login";
+  const accountActive = ["/profile", "/login", "/signup", "/service-request"].some((p) => pathname.startsWith(p));
 
   useEffect(() => {
     setMoreOpen(false);
@@ -52,7 +54,7 @@ export default function BottomNav({ session }: { session: SessionLike }) {
         aria-label="ප්‍රධාන මෙනුව"
         className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-[#080d1a]/95 backdrop-blur-xl border-t border-white/[0.08] pb-[env(safe-area-inset-bottom)]"
       >
-        <div className="grid grid-cols-5 h-16">
+        <div className="grid grid-cols-6 h-16">
           {TABS.map((t) => {
             const active = isActive(pathname, t.href);
             return (
@@ -60,21 +62,35 @@ export default function BottomNav({ session }: { session: SessionLike }) {
                 key={t.href}
                 href={t.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex flex-col items-center justify-center gap-1 text-[11px] ${active ? "text-gold-200" : "text-gray-500"}`}
+                className={`flex flex-col items-center justify-center gap-1 text-[10px] sm:text-[11px] ${active ? "text-gold-200" : "text-gray-500"}`}
               >
-                <span className={`grid place-items-center w-14 h-8 rounded-full transition-colors ${active ? "bg-gold-400/15" : ""}`}>
+                <span className={`grid place-items-center w-12 h-8 rounded-full transition-colors ${active ? "bg-gold-400/15" : ""}`}>
                   <t.icon className="w-[21px] h-[21px]" />
                 </span>
                 {t.label}
               </Link>
             );
           })}
+          <Link
+            href={accountHref}
+            aria-current={accountActive ? "page" : undefined}
+            className={`flex flex-col items-center justify-center gap-1 text-[10px] sm:text-[11px] ${accountActive ? "text-gold-200" : "text-gray-500"}`}
+          >
+            <span className={`grid place-items-center w-12 h-8 rounded-full transition-colors ${accountActive ? "bg-gold-400/15" : ""}`}>
+              {user?.image ? (
+                <img src={user.image} alt="" className={`w-6 h-6 rounded-full object-cover ring-1 ${accountActive ? "ring-gold-300" : "ring-white/20"}`} />
+              ) : (
+                <User className="w-[21px] h-[21px]" />
+              )}
+            </span>
+            ගිණුම
+          </Link>
           <button
             onClick={() => setMoreOpen(true)}
             aria-haspopup="dialog"
-            className={`flex flex-col items-center justify-center gap-1 text-[11px] ${moreActive || moreOpen ? "text-gold-200" : "text-gray-500"}`}
+            className={`flex flex-col items-center justify-center gap-1 text-[10px] sm:text-[11px] ${moreActive || moreOpen ? "text-gold-200" : "text-gray-500"}`}
           >
-            <span className={`grid place-items-center w-14 h-8 rounded-full transition-colors ${moreActive || moreOpen ? "bg-gold-400/15" : ""}`}>
+            <span className={`grid place-items-center w-12 h-8 rounded-full transition-colors ${moreActive || moreOpen ? "bg-gold-400/15" : ""}`}>
               <MoreHorizontal className="w-[21px] h-[21px]" />
             </span>
             තවත්
@@ -128,6 +144,7 @@ export default function BottomNav({ session }: { session: SessionLike }) {
 
               <div className="rounded-2xl bg-[#0d1426] border border-white/[0.07] divide-y divide-white/[0.06] overflow-hidden">
                 {[
+                  ...(user && !isAdmin ? [{ href: "/profile", label: "මගේ ගිණුම සහ ඉල්ලුම්", icon: User }] : []),
                   { href: "/about", label: "අප ගැන", icon: Info },
                   { href: "/blog", label: "ජ්‍යෝතිෂ්‍ය ලිපි", icon: BookOpen },
                   { href: "/contact", label: "අප අමතන්න", icon: MessageCircle },

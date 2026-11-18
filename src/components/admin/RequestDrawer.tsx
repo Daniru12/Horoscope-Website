@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { jsPDF } from "jspdf";
 import toast from "react-hot-toast";
-import { Camera, CheckCircle2, ExternalLink, FileText, ImageIcon, Loader2, Send, X, Copy, Mail, Phone } from "lucide-react";
+import { Camera, CheckCircle2, ExternalLink, FileText, ImageIcon, Loader2, Send, X, Copy, Mail, Phone, MessageCircle } from "lucide-react";
 import {
   Sheet, ConfirmDialog, StageBadge, STAGE_META, stageOf, priceOf, fmtDate, timeAgo, Avatar,
   card, textareaCls, btnPrimary, btnSecondary, btnGreen,
@@ -138,7 +138,14 @@ export default function RequestDrawer({
   useEffect(() => () => stopCamera(), []);
 
   const stage = request ? stageOf(request) : null;
-  const canSendResult = stage === "in_progress" || stage === "verify_payment" || stage === "awaiting_payment";
+  // Result can be sent until it has been sent once (status === "completed") or the request is cancelled.
+  const canSendResult = !!request && request.status !== "completed" && stage !== "cancelled";
+  const resultSent = !!request && request.status === "completed";
+
+  // Number given on the request (falls back to the profile's saved number for older requests)
+  const phone: string = request?.contactNumber || request?.user?.phone || "";
+  // wa.me wants international digits only: 0771234567 → 94771234567
+  const waNumber = phone.replace(/\D/g, "").replace(/^0/, "94");
 
   async function approve() {
     if (!request) return;
@@ -225,7 +232,7 @@ export default function RequestDrawer({
 
   const copyDetails = () => {
     if (!request) return;
-    const text = `${request.user?.name || ""}\n${request.serviceName}\nඋපන් දිනය: ${request.birthDate}\nවේලාව: ${request.birthTime}\nස්ථානය: ${request.birthPlace}`;
+    const text = `${request.user?.name || ""}\n${request.serviceName}\nඋපන් දිනය: ${request.birthDate}\nවේලාව: ${request.birthTime}\nස්ථානය: ${request.birthPlace}${phone ? `\nදුරකථන: ${phone}` : ""}`;
     navigator.clipboard.writeText(text).then(() => toast.success("විස්තර පිටපත් කළා"));
   };
 
@@ -254,6 +261,7 @@ export default function RequestDrawer({
       <Sheet
         open={!!request}
         onClose={onClose}
+        full
         footer={footer}
         title={
           request && (
@@ -268,7 +276,9 @@ export default function RequestDrawer({
         }
       >
         {request && stage && (
-          <div className="space-y-6">
+          <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+           {/* Left column: who + what */}
+           <div className="space-y-6">
             {/* Stage + next step */}
             <div className={`${card} p-4`}>
               <div className="flex items-center justify-between gap-3">
@@ -279,16 +289,26 @@ export default function RequestDrawer({
             </div>
 
             {/* Contact */}
-            {request.user?.email && (
-              <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              {phone && (
+                <a href={`tel:${phone}`} className={`${btnSecondary} !h-11 text-sm`}>
+                  <Phone className="w-4 h-4" /> අමතන්න
+                </a>
+              )}
+              {phone && (
+                <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className={`${btnSecondary} !h-11 text-sm`}>
+                  <MessageCircle className="w-4 h-4" /> WhatsApp
+                </a>
+              )}
+              {request.user?.email && (
                 <a href={`mailto:${request.user.email}`} className={`${btnSecondary} !h-11 text-sm`}>
                   <Mail className="w-4 h-4" /> ඊමේල්
                 </a>
-                <button onClick={copyDetails} className={`${btnSecondary} !h-11 text-sm`}>
-                  <Copy className="w-4 h-4" /> පිටපත් කරන්න
-                </button>
-              </div>
-            )}
+              )}
+              <button onClick={copyDetails} className={`${btnSecondary} !h-11 text-sm`}>
+                <Copy className="w-4 h-4" /> පිටපත් කරන්න
+              </button>
+            </div>
 
             {/* Details */}
             <section>
@@ -299,6 +319,7 @@ export default function RequestDrawer({
                   ["උපන් වේලාව", request.birthTime],
                   ["උපන් ස්ථානය", request.birthPlace],
                   ["ලැබුණේ", `${fmtDate(request.createdAt, true)} · ${timeAgo(request.createdAt)}`],
+                  ["දුරකථන අංකය", phone],
                   ["ඊමේල්", request.user?.email],
                 ].map(([k, v]) => (
                   <div key={k} className="flex items-start justify-between gap-4 px-4 py-3.5">
@@ -309,6 +330,14 @@ export default function RequestDrawer({
               </dl>
             </section>
 
+            {/* Customer note */}
+            {request.note && (
+              <section>
+                <h3 className="text-xs font-semibold tracking-wide text-gray-500 mb-2">පාරිභෝගික සටහන</h3>
+                <div className={`${card} p-4 text-[15px] text-gray-100 whitespace-pre-wrap break-words leading-relaxed`}>{request.note}</div>
+              </section>
+            )}
+
             {/* Attachments */}
             <section>
               <h3 className="text-xs font-semibold tracking-wide text-gray-500 mb-2">ඇමුණුම්</h3>
@@ -318,8 +347,12 @@ export default function RequestDrawer({
               </div>
             </section>
 
+           </div>
+
+           {/* Right column: result */}
+           <div className="space-y-6">
             {/* Result already sent */}
-            {stage === "completed" && (
+            {resultSent && (
               <section>
                 <h3 className="text-xs font-semibold tracking-wide text-gray-500 mb-2">යැවූ ප්‍රතිඵලය · {fmtDate(request.updatedAt)}</h3>
                 <div className={`${card} p-4 space-y-4`}>
@@ -346,8 +379,8 @@ export default function RequestDrawer({
             {canSendResult && (
               <section>
                 <h3 className="text-xs font-semibold tracking-wide text-gray-500 mb-2">ප්‍රතිඵල යවන්න</h3>
-                {stage !== "in_progress" && (
-                  <p className="text-sm text-amber-300/90 mb-3">සටහන: මෙම ඉල්ලීමේ ගෙවීම තවම අනුමත කර නැත.</p>
+                {stage === "verify_payment" && (
+                  <p className="text-sm text-amber-300/90 mb-3">සටහන: රිසිට්පතක් ලැබී ඇත. ගෙවීම අනුමත කිරීමට පහළින් ඇති ඇමුණුම් බලන්න.</p>
                 )}
                 <form id={FORM_ID} onSubmit={sendResult} className="space-y-3">
                   <textarea
@@ -407,11 +440,7 @@ export default function RequestDrawer({
               </section>
             )}
 
-            {request.user?.phone && (
-              <a href={`tel:${request.user.phone}`} className={`${btnSecondary} w-full`}>
-                <Phone className="w-4 h-4" /> {request.user.phone}
-              </a>
-            )}
+           </div>
           </div>
         )}
       </Sheet>

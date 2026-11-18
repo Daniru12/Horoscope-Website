@@ -124,7 +124,7 @@ export default function PaymentUpload({ requestId }: PaymentUploadProps) {
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-lg mx-auto">
-      <label className="cursor-pointer bg-space-800 hover:bg-space-700 border border-space-600 hover:border-gold-500/50 w-full flex-1 py-3 px-2 rounded-xl text-sm text-white font-bold transition-all flex items-center justify-center gap-2 text-center shadow-lg group">
+      <label className="cursor-pointer min-h-[48px] bg-space-800 hover:bg-space-700 border border-space-600 hover:border-gold-500/50 w-full flex-1 py-3 px-2 rounded-xl text-sm text-white font-bold transition-all flex items-center justify-center gap-2 text-center shadow-lg group">
         <Upload className="w-5 h-5 text-gold-400 group-hover:scale-110 transition-transform shrink-0" />
         <span className="truncate">ගොනුව (File/PDF)</span>
         <input 
@@ -145,7 +145,7 @@ export default function PaymentUpload({ requestId }: PaymentUploadProps) {
       <button
         type="button"
         onClick={startCamera}
-        className="cursor-pointer bg-space-800 hover:bg-space-700 border border-space-600 hover:border-gold-500/50 w-full flex-1 py-3 px-2 rounded-xl text-sm text-white font-bold transition-all flex items-center justify-center gap-2 text-center shadow-lg group"
+        className="cursor-pointer min-h-[48px] bg-space-800 hover:bg-space-700 border border-space-600 hover:border-gold-500/50 w-full flex-1 py-3 px-2 rounded-xl text-sm text-white font-bold transition-all flex items-center justify-center gap-2 text-center shadow-lg group"
       >
         <Camera className="w-5 h-5 text-gold-400 group-hover:scale-110 transition-transform shrink-0" />
         <span className="truncate">කැමරාව (Camera)</span>

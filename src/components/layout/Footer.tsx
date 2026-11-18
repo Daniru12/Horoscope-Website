@@ -15,7 +15,10 @@ export default async function Footer() {
   const mobileNumber = settings.mobileNumber || "+94 711 038 064";
 
   return (
-    <footer className="relative mt-auto border-t border-[var(--hairline)] bg-space-900/70 backdrop-blur-md pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
+    <>
+    {/* Mobile: footer is hidden (bottom nav replaces it); keep clearance so content isn't covered by the nav */}
+    <div aria-hidden className="lg:hidden h-[calc(4.5rem+env(safe-area-inset-bottom))]" />
+    <footer className="hidden lg:block relative mt-auto border-t border-[var(--hairline)] bg-space-900/70 backdrop-blur-md">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-400/60 to-transparent" />
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 pt-16 pb-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-12">
         <div className="md:col-span-6">
@@ -62,5 +65,6 @@ export default async function Footer() {
         <p>&copy; {new Date().getFullYear()} සුභද්‍රා රත්නායක ජ්‍යෝතිෂ්‍ය සේවය. සියලුම හිමිකම් ඇවිරිණි.</p>
       </div>
     </footer>
+    </>
   );
 }

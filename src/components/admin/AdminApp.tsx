@@ -80,11 +80,12 @@ export default function AdminApp({
   const openRequest = useMemo(() => requests.find((r) => r._id === openId) || null, [requests, openId]);
 
   const counts = useMemo(() => {
-    const c: Record<Stage, number> = { awaiting_payment: 0, verify_payment: 0, in_progress: 0, completed: 0, cancelled: 0 };
+    const c: Record<Stage, number> = { new: 0, awaiting_payment: 0, verify_payment: 0, in_progress: 0, completed: 0, cancelled: 0 };
     rows.forEach((r) => c[r._stage as Stage]++);
     return c;
   }, [rows]);
-  const todo = counts.verify_payment + counts.in_progress;
+  const isTodo = (s: Stage) => s === "new" || s === "verify_payment" || s === "in_progress";
+  const todo = counts.new + counts.verify_payment + counts.in_progress;
 
   const approved = useMemo(() => requests.filter((r) => r.paymentStatus === "approved"), [requests]);
   const income = useMemo(() => {
@@ -103,7 +104,7 @@ export default function AdminApp({
   const todoList = useMemo(
     () =>
       rows
-        .filter((r) => r._stage === "verify_payment" || r._stage === "in_progress")
+        .filter((r) => isTodo(r._stage))
         .sort((a, b) => STAGE_ORDER.indexOf(a._stage) - STAGE_ORDER.indexOf(b._stage) || +new Date(a.createdAt) - +new Date(b.createdAt)),
     [rows]
   );
@@ -111,7 +112,7 @@ export default function AdminApp({
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     const list = rows.filter((r) => {
-      if (filter === "todo" && r._stage !== "verify_payment" && r._stage !== "in_progress") return false;
+      if (filter === "todo" && !isTodo(r._stage)) return false;
       if (filter !== "todo" && filter !== "all" && r._stage !== filter) return false;
       if (userFilter && !sameUser(r, userFilter._id)) return false;
       if (!q) return true;
@@ -248,6 +249,7 @@ export default function AdminApp({
                   <p className="text-4xl font-bold mt-1 tabular-nums">{todo}</p>
                   <div className="flex flex-wrap gap-2 mt-3 text-sm font-medium">
                     {counts.verify_payment > 0 && <span className="px-3 py-1 rounded-full bg-black/10">ගෙවීම් තහවුරු කිරීමට {counts.verify_payment}</span>}
+                    {counts.new > 0 && <span className="px-3 py-1 rounded-full bg-black/10">අලුත් ඉල්ලීම් {counts.new}</span>}
                     {counts.in_progress > 0 && <span className="px-3 py-1 rounded-full bg-black/10">ප්‍රතිඵල යැවීමට {counts.in_progress}</span>}
                   </div>
                   <span className="inline-flex items-center gap-2 mt-5 h-11 px-5 rounded-xl bg-[#1a1304] text-gold-200 font-semibold">
@@ -278,7 +280,7 @@ export default function AdminApp({
               <section>
                 <SectionTitle>ඉල්ලීම් තත්ත්වය</SectionTitle>
                 <div className={`${card} divide-y divide-white/[0.06]`}>
-                  {(["verify_payment", "in_progress", "awaiting_payment", "completed"] as Stage[]).map((s) => (
+                  {(["new", "verify_payment", "in_progress", "awaiting_payment", "completed"] as Stage[]).map((s) => (
                     <button key={s} onClick={() => showRequests(s)} className="w-full flex items-center gap-3 px-4 h-14 text-left hover:bg-white/[0.03]">
                       <span className={`w-2.5 h-2.5 rounded-full ${STAGE_META[s].dot}`} />
                       <span className="flex-1 text-[15px] text-gray-200">{STAGE_META[s].label}</span>
@@ -345,6 +347,7 @@ export default function AdminApp({
                   {([
                     ["todo", "කළ යුතු", todo],
                     ["all", "සියල්ල", requests.length],
+                    ["new", STAGE_META.new.short, counts.new],
                     ["verify_payment", STAGE_META.verify_payment.short, counts.verify_payment],
                     ["in_progress", STAGE_META.in_progress.short, counts.in_progress],
                     ["awaiting_payment", STAGE_META.awaiting_payment.short, counts.awaiting_payment],
@@ -538,7 +541,10 @@ function Stat({ label, value, onClick }: { label: string; value: string; onClick
 
 function RequestCard({ r, services, onOpen }: { r: any; services: any[]; onOpen: () => void }) {
   return (
-    <button onClick={onOpen} className={`${card} ${cardHover} w-full text-left p-4 flex gap-3.5 active:scale-[0.99] transition-transform`}>
+    <button
+      onClick={onOpen}
+      className={`${card} ${cardHover} w-full text-left p-4 flex gap-3.5 active:scale-[0.99] transition-transform ${r._stage === "new" ? "ring-1 ring-violet-400/40" : ""}`}
+    >
       <Avatar name={r.user?.name} image={r.user?.image} size={44} />
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-3">
@@ -546,6 +552,15 @@ function RequestCard({ r, services, onOpen }: { r: any; services: any[]; onOpen:
           <span className="text-sm font-semibold text-gray-200 tabular-nums whitespace-nowrap">{priceOf(r, services)}</span>
         </div>
         <p className="text-sm text-gray-400 truncate mt-0.5">{r.serviceName || "ජ්‍යෝතිෂ්‍ය කියවීම"}</p>
+        {(r.contactNumber || r.user?.email) && (
+          <p className="text-xs text-gray-500 truncate">{[r.contactNumber, r.user?.email].filter(Boolean).join(" · ")}</p>
+        )}
+        {r.note && <p className="text-xs text-amber-300/80 truncate mt-1">📝 {r.note}</p>}
+        {(r.birthDate || r.birthPlace) && (
+          <p className="text-xs text-gray-500 truncate mt-1">
+            {[r.birthDate, r.birthTime, r.birthPlace].filter(Boolean).join(" · ")}
+          </p>
+        )}
         <div className="flex items-center justify-between gap-3 mt-2.5">
           <StageBadge stage={r._stage} short />
           <span className="text-xs text-gray-500 whitespace-nowrap">{timeAgo(r.createdAt)}</span>

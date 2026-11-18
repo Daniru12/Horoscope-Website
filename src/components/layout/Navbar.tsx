@@ -25,6 +25,11 @@ export default async function Navbar() {
 
           <nav className="hidden lg:flex gap-8 items-center whitespace-nowrap text-[0.95rem] font-medium">
             <NavLinks />
+            {session && !isAdmin && (
+              <Link href="/profile" className="nav-link">
+                මගේ ගිණුම
+              </Link>
+            )}
             {isAdmin && (
               <Link href="/admin" className="nav-link !text-emerald-300 font-bold">
                 Admin Panel
